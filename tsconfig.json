@@ -25,7 +25,16 @@
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    // Agregadas para DataTables y jQuery
+    "types": [
+      "node",
+      "jquery",
+      "datatables.net"
+    ],
+    // Permitir declaraciones globales
+    "allowJs": true,
+    "skipDefaultLibCheck": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

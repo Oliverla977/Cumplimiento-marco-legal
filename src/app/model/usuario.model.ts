@@ -1,4 +1,4 @@
 export class Usuario {
-    public id: number;
-    public nombre: string;
+    public id: number = 0;
+    public nombre: string = '';
 }

@@ -1,2 +1,17 @@
-<table datatable [dtOptions]="dtOptions" class="row-border hover">
-</table>
+<div class="container mt-4">
+  <h2>Lista de Usuarios</h2>
+  <table id="tablaUsuarios" class="display table table-bordered" style="width:100%">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let usuario of usuarios">
+        <td>{{ usuario.id }}</td>
+        <td>{{ usuario.nombre }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
