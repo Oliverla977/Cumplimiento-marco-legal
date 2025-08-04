@@ -1,17 +1,81 @@
 <div class="container mt-4">
-  <h2>Lista de Usuarios</h2>
+    <div class="row">
+        <div class="col">
+            <h2>Usuarios</h2>
+        </div>
+        <div class="col text-end">
+            <button cButton color="success" variant="outline" (click)="abrirModal()">
+                <svg cIcon class="me-2" name="cil-user-plus"></svg>
+                Nuevo Usuario
+            </button>
+        </div>
+    </div>
+  
   <table id="tablaUsuarios" class="display table table-bordered" style="width:100%">
     <thead>
       <tr>
         <th>ID</th>
         <th>Nombre</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let usuario of usuarios">
-        <td>{{ usuario.id }}</td>
+        <td>{{ usuario.id_usuario }}</td>
         <td>{{ usuario.nombre }}</td>
+        <td>{{ usuario.correo }}</td>
+        <td>{{ usuario.rol }}</td>
+        <td>{{ usuario.estado }}</td>
+        <td class="text-center">
+          <button cButton color="warning" variant="outline" class="me-2" title="Editar usuario" (click)="editarUsuario(usuario)">
+            <svg cIcon name="cil-pencil"></svg>
+          </button>
+          <button *ngIf="usuario.estado === 'Activo'; else activarBtn" cButton color="danger" variant="outline" title="Deshabilitar usuario" (click)="desactivarUsuario(usuario)">
+            <svg cIcon name="cil-trash"></svg>
+          </button>
+          <ng-template #activarBtn>
+            <button cButton color="success" variant="outline" title="Habilitar usuario" (click)="activarUsuario(usuario)">
+              <svg cIcon name="cil-action-undo"></svg>
+            </button>
+          </ng-template>
       </tr>
     </tbody>
   </table>
 </div>
+
+<!-- Modal de nuevo usuario -->
+<c-modal [(visible)]="modalVisible" size="lg" backdrop="static" alignment="center">
+  <c-modal-header>
+    <h5 class="modal-title">Nuevo Usuario</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="formUsuario" class="mx-lg-5 mx-md-2 px-lg-3 px-md-2">
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input cInput formControlName="nombre" class="form-control" type="text" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,}$" minlength="3" title="mínimo 3 caracteres" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Correo</label>
+        <input cInput formControlName="correo" class="form-control" type="email" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Rol</label>
+        <select cInput formControlName="rol" class="form-select">
+          <option *ngFor="let rol of roles" [value]="rol.id_rol">
+            {{ rol.nombre }}
+          </option>
+        </select>
+      </div>
+
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cerrarModal()">Cancelar</button>
+    <button cButton color="primary" (click)="editando ? actualizarUsuario() : guardarUsuario()" [disabled]="formUsuario.invalid">
+      {{ editando ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </c-modal-footer>
+</c-modal>
