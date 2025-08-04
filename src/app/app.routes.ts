@@ -10,7 +10,7 @@ export const routes: Routes = [
     path: '',
     loadComponent: () => import('./layout').then(m => m.DefaultLayoutComponent),
     data: {
-      title: 'Home'
+      title: 'Inicio'
     },
     children: [
       {
@@ -20,6 +20,10 @@ export const routes: Routes = [
       {
         path: 'usuarios',
         loadChildren: () => import('./views/marco-legal/usuarios/routes').then((m) => m.routes)
+      },
+      {
+        path: 'empresas',
+        loadChildren: () => import('./views/marco-legal/empresas/routes').then((m) => m.routes)
       },
       {
         path: 'theme',
