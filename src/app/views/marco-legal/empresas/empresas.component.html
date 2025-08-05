@@ -1,1 +1,77 @@
-<p>empresas works!</p>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <h2>Empresas</h2>
+        </div>
+        <div class="col text-end">
+            <button cButton color="success" variant="outline" (click)="abrirModal()" >
+                <svg cIcon class="me-2" name="cil-building"></svg>
+                Nueva Empresa
+            </button>
+        </div>
+    </div>
+  
+  <table id="tablaEmpresas" class="display table table-bordered" style="width:100%">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>Sector</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let empresa of empresas">
+        <td>{{ empresa.id_empresa }}</td>
+        <td>{{ empresa.nombre }}</td>
+        <td>{{ empresa.sector }}</td>
+        <td>{{ empresa.estado }}</td>
+        <td class="text-center">
+          <button cButton color="warning" variant="outline" class="me-2" title="Editar empresa" (click)="editarEmpresa(empresa)">
+            <svg cIcon name="cil-pencil"></svg>
+          </button>
+
+          <button cButton color="secondary" variant="outline" class="me-2" title="Ver empresa">
+            <svg cIcon name="cil-zoom"></svg>
+          </button>
+
+          <button *ngIf="empresa.estado === 'Habilitada'; else activarBtn" cButton color="danger" variant="outline" title="Deshabilitar empresa" (click)="desactivarEmpresa(empresa)">
+            <svg cIcon name="cil-trash"></svg>
+          </button>
+          <ng-template #activarBtn>
+            <button cButton color="success" variant="outline" title="Habilitar empresa" (click)="activarEmpresa(empresa)">
+              <svg cIcon name="cil-action-undo"></svg>
+            </button>
+          </ng-template>
+
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal de nueva empresa -->
+<c-modal [(visible)]="modalVisible" size="lg" backdrop="static" alignment="center">
+  <c-modal-header>
+    <h5 class="modal-title">Nueva Empresa</h5>
+  </c-modal-header>
+  <c-modal-body>
+    <form [formGroup]="formEmpresa" class="mx-lg-5 mx-md-2 px-lg-3 px-md-2">
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input cInput formControlName="nombre" class="form-control" type="text" />
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Sector</label>
+        <input cInput formControlName="sector" class="form-control" type="text" />
+      </div>
+
+    </form>
+  </c-modal-body>
+  <c-modal-footer>
+    <button cButton color="secondary" (click)="cerrarModal()">Cancelar</button>
+    <button cButton color="primary" (click)="editando ? actualizarEmpresa() : guardarEmpresa()" [disabled]="formEmpresa.invalid">
+      {{ editando ? 'Actualizar' : 'Guardar' }}
+    </button>
+  </c-modal-footer>
+</c-modal>
