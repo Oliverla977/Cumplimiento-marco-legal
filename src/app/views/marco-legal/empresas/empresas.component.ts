@@ -4,16 +4,27 @@ import { EmpresaModel } from '../../../model/empresa.model';
 import { EmpresaService } from '../../../service/empresa.service';
 import { IconSetService } from '@coreui/icons-angular';
 import { CommonModule } from '@angular/common';
-import { ButtonDirective } from '@coreui/angular';
+import { ButtonDirective, ButtonCloseDirective } from '@coreui/angular';
 import { IconDirective } from '@coreui/icons-angular';
 import { ModalModule } from '@coreui/angular';
+import { ListGroupDirective, ListGroupItemDirective, ProgressComponent  } from '@coreui/angular';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import $ from 'jquery';
 import 'datatables.net';
 
 @Component({
   selector: 'app-empresas',
-  imports: [ CommonModule, ButtonDirective, IconDirective, ModalModule, ReactiveFormsModule],
+  imports: [ 
+    CommonModule,
+    ButtonDirective,
+    IconDirective,
+    ModalModule,
+    ReactiveFormsModule,
+    ButtonCloseDirective,
+    ListGroupDirective,
+    ListGroupItemDirective,
+    ProgressComponent 
+  ],
   templateUrl: './empresas.component.html',
   styleUrl: './empresas.component.scss',
   encapsulation: ViewEncapsulation.None
@@ -27,6 +38,11 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
   formEmpresa!: FormGroup;
   editando: boolean = false;
   usuarioEditandoId: number | null = null;
+  //modal para ver detalle de empresa
+  detalleEmpresa: EmpresaModel | null = null;
+  modalEmpresaVisible: boolean = false;
+  nombreEmpresa: string = '';
+  sectorEmpresa: string = '';
 
   constructor(
     private empresaService: EmpresaService,
@@ -126,7 +142,8 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  actualizarEmpresa(): void {
+  actualizarEmpresa():
+   void {
     if (this.formEmpresa.valid && this.usuarioEditandoId !== null) {
       const datosActualizados = {
         id_usuario: this.usuarioEditandoId,
@@ -135,6 +152,15 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       console.log('Actualizar empresa:', datosActualizados);
       // servcio para actualizar
       this.cerrarModal();
+    }
+  }
+
+  verDetalleEmpresa(empresa: EmpresaModel): void {
+    this.detalleEmpresa = empresa;
+    this.modalEmpresaVisible = true;
+    if (empresa) {
+      this.nombreEmpresa = empresa.nombre;
+      this.sectorEmpresa = empresa.sector;
     }
   }
 

@@ -32,7 +32,7 @@
             <svg cIcon name="cil-pencil"></svg>
           </button>
 
-          <button cButton color="secondary" variant="outline" class="me-2" title="Ver empresa">
+          <button cButton color="secondary" variant="outline" class="me-2" title="Ver empresa" (click)="verDetalleEmpresa(empresa)" >
             <svg cIcon name="cil-zoom"></svg>
           </button>
 
@@ -75,3 +75,70 @@
     </button>
   </c-modal-footer>
 </c-modal>
+
+<!-- Modal vista de empresa (detalle, historial de evaluaciones y asignacion de auditor) -->
+<c-modal #detalleEmpresa id="detalleEmpresa" scrollable [(visible)]="modalEmpresaVisible" alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>{{nombreEmpresa + ' - ' + sectorEmpresa}}</h5>
+    <button [cModalToggle]="detalleEmpresa.id" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <ng-container *ngTemplateOutlet="vistaDetalleEmpresa"></ng-container>
+  </c-modal-body>
+  <c-modal-footer>
+    <button [cModalToggle]="detalleEmpresa.id" cButton color="secondary">
+      Cerrar
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<ng-template #vistaDetalleEmpresa>
+  <div class="container">
+    <div class="row">
+      <div class="col-6 h5">
+        Auditores asignados:
+      </div>
+      <div class="col-6 text-end">
+        <button cButton color="primary" variant="outline" >
+          Asignar Auditor
+        </button>
+      </div>
+    </div>
+    <div class="row mt-3 ps-2">
+      <ul cListGroup>
+        <li cListGroupItem>Oliver López - asignado el 10/04/2025</li>
+      </ul>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col mt-4">
+        <h5>Historial de evaluaciones</h5>
+      </div>
+    </div>  
+    <div class="row">
+      <div class="col">
+        <ul cListGroup>
+          <li cListGroupItem>
+            <span>Marco legal evaluado: Convenio de Budapest</span>
+            <br>
+            <span class="text-muted">Fecha de evaluación: 01/01/2025</span>
+            <c-progress [animated]="true" [value]="25" color="danger" variant="striped">25%</c-progress>
+          </li>
+          <li cListGroupItem>
+            <span>Marco legal evaluado: Convenio de Budapest</span>
+            <br>
+            <span class="text-muted">Fecha de evaluación: 01/03/2025</span>
+            <c-progress [animated]="true" [value]="65" color="warning" variant="striped">65%</c-progress>
+          </li>
+          <li cListGroupItem>
+            <span>Marco legal evaluado: Convenio de Budapest</span>
+            <br>
+            <span class="text-muted">Fecha de evaluación: 01/06/2025</span>
+            <c-progress [animated]="true" [value]="95" color="success" variant="striped">95%</c-progress>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</ng-template>
