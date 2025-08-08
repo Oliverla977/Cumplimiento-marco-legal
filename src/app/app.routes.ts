@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './security/auth.guard';
 
 export const routes: Routes = [
   {
@@ -15,15 +16,18 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes)
+        loadChildren: () => import('./views/dashboard/routes').then((m) => m.routes),
+        canActivate: [authGuard]
       },
       {
         path: 'usuarios',
-        loadChildren: () => import('./views/marco-legal/usuarios/routes').then((m) => m.routes)
+        loadChildren: () => import('./views/marco-legal/usuarios/routes').then((m) => m.routes),
+        canActivate: [authGuard]
       },
       {
         path: 'empresas',
-        loadChildren: () => import('./views/marco-legal/empresas/routes').then((m) => m.routes)
+        loadChildren: () => import('./views/marco-legal/empresas/routes').then((m) => m.routes),
+        canActivate: [authGuard]
       },
       {
         path: 'theme',
