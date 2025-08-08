@@ -1,5 +1,5 @@
 {
-  "name": "coreui-free-angular-admin-template",
+  "name": "cumplimiento-marco-legal",
   "version": "5.5.5",
   "copyright": "Copyright 2025 creativeLabs Łukasz Holeczek",
   "license": "MIT",
@@ -46,6 +46,7 @@
     "datatables.net-dt": "^2.3.2",
     "datatables.net-responsive": "^3.0.5",
     "datatables.net-responsive-dt": "^3.0.5",
+    "firebase": "^12.1.0",
     "jquery": "^3.7.1",
     "lodash-es": "^4.17.21",
     "ngx-scrollbar": "^13.0.3",
