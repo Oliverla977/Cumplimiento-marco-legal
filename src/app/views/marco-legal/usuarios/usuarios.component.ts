@@ -12,11 +12,15 @@ import { RolService } from '../../../service/rol.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalModule } from '@coreui/angular';
 import { ReactiveFormsModule } from '@angular/forms';
+import { LoginService } from '../../../service/login.service';
+import { NgForm } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+
 
 
 @Component({
   selector: 'app-usuarios',
-  imports: [ CommonModule, ButtonDirective, IconDirective, ModalModule, ReactiveFormsModule ],
+  imports: [ CommonModule, ButtonDirective, IconDirective, ModalModule, ReactiveFormsModule, FormsModule ],
   templateUrl: './usuarios.component.html',
   styleUrl: './usuarios.component.scss',
   encapsulation: ViewEncapsulation.None
@@ -36,7 +40,8 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private usuarioService: UsuarioService,
     private fb: FormBuilder,
-    private rolService: RolService
+    private rolService: RolService,
+    private loginService: LoginService
   ) {}
 
   ngOnInit(): void {
@@ -106,6 +111,11 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
       const nuevoUsuario = this.formUsuario.value;
       console.log('Usuario a guardar:', nuevoUsuario);
       // llamar a un método de UsuarioService para agregarlo
+      this.loginService.registrarse(nuevoUsuario.correo, 'Umg2025*').then(() => {
+        console.log('Usuario registrado exitosamente');
+        //guardar el usuario en la base de datos
+
+      });
       this.cerrarModal();
     }
   }
@@ -143,6 +153,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
     usuario.estado = 'Activo';
     console.log('Usuario activado:', usuario);
   }
+
 
 
 }

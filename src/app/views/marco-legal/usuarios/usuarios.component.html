@@ -55,15 +55,15 @@
     <form [formGroup]="formUsuario" class="mx-lg-5 mx-md-2 px-lg-3 px-md-2">
       <div class="mb-3">
         <label class="form-label">Nombre</label>
-        <input cInput formControlName="nombre" class="form-control" type="text" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,}$" minlength="3" title="mínimo 3 caracteres" />
+        <input cInput formControlName="nombre" class="form-control" type="text" pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,}$" minlength="3" title="mínimo 3 caracteres" required name="nombre"/>
       </div>
       <div class="mb-3">
         <label class="form-label">Correo</label>
-        <input cInput formControlName="correo" class="form-control" type="email" />
+        <input cInput formControlName="correo" class="form-control" type="email"  required name="email"/>
       </div>
       <div class="mb-3">
         <label class="form-label">Rol</label>
-        <select cInput formControlName="rol" class="form-select">
+        <select cInput formControlName="rol" class="form-select" required name="rol">
           <option *ngFor="let rol of roles" [value]="rol.id_rol">
             {{ rol.nombre }}
           </option>
@@ -74,7 +74,7 @@
   </c-modal-body>
   <c-modal-footer>
     <button cButton color="secondary" (click)="cerrarModal()">Cancelar</button>
-    <button cButton color="primary" (click)="editando ? actualizarUsuario() : guardarUsuario()" [disabled]="formUsuario.invalid">
+    <button type="submit" cButton color="primary" (click)="editando ? actualizarUsuario() : guardarUsuario()" [disabled]="formUsuario.invalid">
       {{ editando ? 'Actualizar' : 'Guardar' }}
     </button>
   </c-modal-footer>
