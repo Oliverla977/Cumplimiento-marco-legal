@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "/dist/coreui-free-angular-admin-template/browser/",
+    "public": "dist/coreui-free-angular-admin-template/browser/",
     "ignore": [
       "firebase.json",
       "**/.*",
