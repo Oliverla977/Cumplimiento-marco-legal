@@ -35,6 +35,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
   roles: RolModel[] = [];
   editando: boolean = false;
   usuarioEditandoId: number | null = null;
+  dataTable: any;
 
 
   constructor(
@@ -45,9 +46,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.usuarioService.getUsuarios().subscribe(data => {
-      this.usuarios = data;
-    });
+    this.cargarUsuarios();
 
     this.rolService.getRoles().subscribe(data => {
       this.roles = data;
@@ -67,25 +66,16 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      if (!this.dataTableInitialized) {
-        ($('#tablaUsuarios') as any).DataTable({
-          language: {
-            lengthMenu: 'Mostrar _MENU_ registros por página',
-            zeroRecords: 'No se encontraron resultados',
-            info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
-            infoEmpty: 'Mostrando 0 a 0 de 0 registros',
-            infoFiltered: '(filtrado de _MAX_ registros totales)',
-            search: 'Buscar:',
-            loadingRecords: 'Cargando...',
-            processing: 'Procesando...',
-            emptyTable: 'No hay datos disponibles en la tabla'
-          },
-          scrollX: true
-        });
-        this.dataTableInitialized = true;
-      }
-    }, 200);
+    $('#tablaUsuarios tbody').off('click').on('click', 'button.desactivar', (event) => {
+      const id = $(event.currentTarget).data('id');
+      this.desactivarUsuarioPorId(id);
+    });
+    
+    $('#tablaUsuarios tbody').on('click', 'button.activar', (event) => {
+      const id = $(event.currentTarget).data('id');
+      this.activarUsuarioPorId(id);
+    });
+    
   }
   ngOnDestroy(): void {
     if (this.dataTableInitialized) {
@@ -107,18 +97,38 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   guardarUsuario(): void {
-    if (this.formUsuario.valid) {
-      const nuevoUsuario = this.formUsuario.value;
-      console.log('Usuario a guardar:', nuevoUsuario);
-      // llamar a un método de UsuarioService para agregarlo
-      this.loginService.registrarse(nuevoUsuario.correo, 'Umg2025*').then(() => {
-        console.log('Usuario registrado exitosamente');
-        //guardar el usuario en la base de datos
+  if (this.formUsuario.valid) {
+    const nuevoUsuario = this.formUsuario.value;
 
+    console.log('Usuario a guardar:', nuevoUsuario);
+
+    this.loginService.registrarse(nuevoUsuario.correo, 'Umg2025*')
+      .then((credenciales) => {
+        console.log('Usuario registrado en Firebase', credenciales);
+
+        // Datos a enviar a MySQL
+        const usuarioMysql = {
+          uid_firebase: credenciales.user.uid,
+          nombre: nuevoUsuario.nombre,
+          correo: nuevoUsuario.correo,
+          rol: nuevoUsuario.rol
+        };
+
+        this.usuarioService.registrarUsuario(usuarioMysql).subscribe({
+          next: (res) => {
+            console.log('Usuario guardado en MySQL', res);
+            this.cerrarModal();
+          },
+          error: (err) => {
+            console.error('Error al guardar en MySQL', err);
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error al registrar en Firebase', error);
       });
-      this.cerrarModal();
-    }
   }
+}
 
   editarUsuario(usuario: any): void {
   this.editando = true;
@@ -145,14 +155,114 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   desactivarUsuario(usuario: UsuarioModel): void {
-    usuario.estado = 'Inactivo';
-    console.log('Usuario desactivado:', usuario);
+    this.usuarioService.deshabilitarUsuario(usuario.id_usuario).subscribe({
+      next: () => {
+        this.cargarUsuarios(); // Recarga la lista
+      },
+      error: (err) => {
+        console.error('Error al deshabilitar usuario:', err);
+      }
+    });
   }
 
   activarUsuario(usuario: UsuarioModel): void {
-    usuario.estado = 'Activo';
-    console.log('Usuario activado:', usuario);
+    this.usuarioService.habilitarUsuario(usuario.id_usuario).subscribe({
+      next: () => {
+        this.cargarUsuarios(); // Recarga la lista
+      },
+      error: (err) => {
+        console.error('Error al habilitar usuario:', err);
+      }
+    });
   }
+
+  cargarUsuarios(): void {
+    console.log('Cargando usuarios...');
+    this.usuarioService.obtenerUsuarios().subscribe({
+      next: (res) => {
+        this.usuarios = res.data;
+        console.log('Usuarios cargados:', this.usuarios);
+        if (!this.dataTable) {
+          this.dataTable = ($('#tablaUsuarios') as any).DataTable({
+            data: this.usuarios,
+            columns: [
+              { data: 'id_usuario' },
+              { data: 'nombre' },
+              { data: 'correo' },
+              { data: 'rol' },
+              {
+                data: 'estado',
+                render: (data: string) => data === 'Activo' ? 'Activo' : 'Inactivo'
+              },
+              {
+                data: null,
+                orderable: false,
+                render: (data: any, type: any, row: UsuarioModel) => {
+                  if (row.estado === 'Activo') {
+                    return `<button class="btn btn-outline-danger btn-sm desactivar" data-id="${row.id_usuario}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0A.5.5 0 0 1 8.5 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 1 1 0-2H6l1-1h2l1 1h3a1 1 0 0 1 1 1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118z"/>
+                              </svg>
+                              </svg>
+                            </button>`;
+                  } else {
+                    return `<button class="btn btn-outline-success btn-sm activar" data-id="${row.id_usuario}">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M5.854 4.146a.5.5 0 0 1 0 .708L3.707 7H11.5A4.5 4.5 0 0 1 16 11.5a.5.5 0 0 1-1 0 3.5 3.5 0 0 0-3.5-3.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0z"/>
+                      </svg>
+                      
+                    </button>`;
+                  }
+                }
+
+              }
+            ],
+            language: {
+              lengthMenu: 'Mostrar _MENU_ registros por página',
+              zeroRecords: 'No se encontraron resultados',
+              info: 'Mostrando _START_ a _END_ de _TOTAL_ registros',
+              infoEmpty: 'Mostrando 0 a 0 de 0 registros',
+              infoFiltered: '(filtrado de _MAX_ registros totales)',
+              search: 'Buscar:',
+              loadingRecords: 'Cargando...',
+              processing: 'Procesando...',
+              emptyTable: 'No hay datos disponibles en la tabla'
+            },
+            scrollX: true
+          });
+  
+          // Aquí puedes agregar la captura de eventos para los botones:
+          $('#tablaUsuarios tbody').off('click').on('click', 'button.desactivar', (event) => {
+            const id = $(event.currentTarget).data('id');
+            this.desactivarUsuarioPorId(id);
+          });
+  
+          $('#tablaUsuarios tbody').on('click', 'button.activar', (event) => {
+            const id = $(event.currentTarget).data('id');
+            this.activarUsuarioPorId(id);
+          });
+  
+        } else {
+          // Si ya está inicializada, actualizamos los datos
+          this.dataTable.clear();
+          this.dataTable.rows.add(this.usuarios);
+          this.dataTable.draw();
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar usuarios:', err);
+      }
+    });
+  }
+
+  desactivarUsuarioPorId(id_usuario: number): void {
+    this.usuarioService.deshabilitarUsuario(id_usuario).subscribe(() => this.cargarUsuarios());
+  }
+  
+  activarUsuarioPorId(id_usuario: number): void {
+    this.usuarioService.habilitarUsuario(id_usuario).subscribe(() => this.cargarUsuarios());
+  }
+
 
 
 

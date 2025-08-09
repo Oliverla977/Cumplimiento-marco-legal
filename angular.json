@@ -39,10 +39,12 @@
             ],
             "styles": [
               "node_modules/datatables.net-dt/css/dataTables.dataTables.min.css",
-              "src/scss/styles.scss"
+                "node_modules/datatables.net-dt/css/dataTables.dataTables.css",
+                "src/scss/styles.scss"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/datatables.net/js/dataTables.js",
               "node_modules/datatables.net-dt/js/dataTables.dataTables.min.js"
             ],
             "allowedCommonJsDependencies": [],

@@ -20,6 +20,8 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 import { environment } from '../environments/environment';
 import { provideServiceWorker } from '@angular/service-worker';
+import { provideHttpClient } from '@angular/common/http';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -43,6 +45,7 @@ export const appConfig: ApplicationConfig = {
       provideFirestore(() => getFirestore()), provideServiceWorker('ngsw-worker.js', {
               enabled: !isDevMode(),
               registrationStrategy: 'registerWhenStable:30000'
-            })
+            }),
+    provideHttpClient()
   ]
 };
