@@ -118,6 +118,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
           next: (res) => {
             console.log('Usuario guardado en MySQL', res);
             this.cerrarModal();
+            this.cargarUsuarios();
           },
           error: (err) => {
             console.error('Error al guardar en MySQL', err);
