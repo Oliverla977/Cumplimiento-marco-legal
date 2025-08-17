@@ -135,29 +135,43 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  actualizarUsuario(): void {
-    if (this.formUsuario.valid && this.usuarioEditandoId !== null) {
-      const datosActualizados = {
-        id_usuario: this.usuarioEditandoId,
-        correo: this.formUsuario.value.correo,
-        nombre: this.formUsuario.value.nombre,
-        id_rol: this.formUsuario.value.rol
-      };
-  
-      console.log('datos de usuario por actualizar:', datosActualizados);
-  
-      this.usuarioService.actualizarUsuario(datosActualizados).subscribe({
-        next: (res) => {
-          console.log('Usuario actualizado:', res);
-          this.cerrarModal();
-          this.cargarUsuarios(); // refrescar tabla
-        },
-        error: (err) => {
-          console.error('Error al actualizar usuario:', err);
+ async actualizarUsuario(): Promise<void> {
+      if (this.formUsuario.valid && this.usuarioEditandoId !== null) {
+        const datosActualizados = {
+          id_usuario: this.usuarioEditandoId,
+          nombre: this.formUsuario.value.nombre,
+          correo: this.formUsuario.get('correo')?.value,
+          id_rol: this.formUsuario.value.rol
+        };
+
+    
+        console.log('Actualizar usuario:', datosActualizados);
+    
+        try {
+          // Si el usuario no está verificado, actualizar correo en Firebase
+          const usuarioActual = await this.usuarioService.obtenerUsuario(this.usuarioEditandoId).toPromise();
+          if (usuarioActual.data.verificado === 0 && usuarioActual.data.correo !== datosActualizados.correo) {
+            await this.loginService.updateEmailFirebase(datosActualizados.correo);
+            console.log('Correo actualizado en Firebase con contraseña por defecto');
+          }
+    
+          // Actualizar también en MySQL
+          this.usuarioService.actualizarUsuario(datosActualizados).subscribe({
+            next: (res) => {
+              console.log('Usuario actualizado en MySQL:', res);
+              this.cerrarModal();
+              this.cargarUsuarios();
+            },
+            error: (err) => console.error('Error al actualizar en MySQL:', err)
+          });
+    
+        } catch (error: any) {
+          console.error(error.message);
+          alert(error.message);
         }
-      });
+      }
     }
-  }
+    
   
 
   desactivarUsuario(usuario: UsuarioModel): void {
@@ -249,6 +263,9 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
             this.editando = true;
             this.usuarioEditandoId = usuario.id_usuario;
             this.modalVisible = true;
+
+            console.log('Editar usuario ID edit:', usuario.id_usuario);
+            this.editarUsuarioPorId(usuario.id_usuario);
         
             this.formUsuario.setValue({
               nombre: usuario.nombre,
@@ -293,6 +310,32 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
     //console.log('Usuario activado con ID:', id_usuario);
   }
 
+
+  editarUsuarioPorId(id_usuario: number): void {
+      this.usuarioService.obtenerUsuario(id_usuario).subscribe({
+        next: (res) => {
+          const usuario = res.data[0];
+          console.log('Usuario a editar cc:', usuario);
+          console.log('usuario verificado:', usuario.verificado);
+    
+          this.editando = true;
+          this.usuarioEditandoId = id_usuario;
+          this.modalVisible = true;
+    
+          // Si ya fue verificado, deshabilitar input de correo
+          const correoDisabled = usuario.verificado === 1;
+    
+          this.formUsuario = this.fb.group({
+            nombre: [usuario.nombre, Validators.required],
+            correo: [{ value: usuario.correo, disabled: correoDisabled }, [Validators.required, Validators.email]],
+            rol: [usuario.id_rol, Validators.required]
+          });
+          console.log('entro en validacion de correo:' + correoDisabled);
+        },
+        error: (err) => console.error('Error al obtener usuario:', err)
+      });
+    }
+    
 
 
 

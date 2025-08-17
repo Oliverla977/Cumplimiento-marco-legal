@@ -8,7 +8,8 @@ import {
   sendPasswordResetEmail,
   updatePassword,
   reauthenticateWithCredential,
-  EmailAuthProvider
+  EmailAuthProvider,
+  updateEmail
 } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 
@@ -91,5 +92,32 @@ export class LoginService {
     
     return { valid: true, message: 'Contraseña válida' };
   }
+
+  async updateEmailFirebase(newEmail: string): Promise<void> {
+      const user = this.auth.currentUser;
+      const currentPassword:string = "Umg2025*";
+      if (!user || !user.email) throw new Error('No hay usuario autenticado');
+    
+      try {
+        // Reautenticación
+        const credential = EmailAuthProvider.credential(user.email, currentPassword);
+        await reauthenticateWithCredential(user, credential);
+    
+        // Actualizar correo
+        await updateEmail(user, newEmail);
+        console.log('Correo actualizado en Firebase');
+      } catch (error: any) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            throw new Error('El correo ya está en uso');
+          case 'auth/invalid-email':
+            throw new Error('Correo inválido');
+          case 'auth/requires-recent-login':
+            throw new Error('Por seguridad, inicia sesión nuevamente');
+          default:
+            throw new Error('Error al actualizar correo: ' + error.message);
+        }
+      }
+    }
 
 }

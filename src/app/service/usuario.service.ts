@@ -33,4 +33,8 @@ export class UsuarioService {
   actualizarUsuario(usuario: UsuarioSimpleModel): Observable<any> {
     return this.http.put(`${this.apiUrl}/usuarios/actualizar/${usuario.id_usuario}`, usuario);
   }
+
+  obtenerUsuario(id_usuario: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/usuarios/${id_usuario}`, {});
+  }
 }
