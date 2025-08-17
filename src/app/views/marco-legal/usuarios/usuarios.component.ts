@@ -66,17 +66,9 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    $('#tablaUsuarios tbody').off('click').on('click', 'button.desactivar', (event) => {
-      const id = $(event.currentTarget).data('id');
-      this.desactivarUsuarioPorId(id);
-    });
-    
-    $('#tablaUsuarios tbody').on('click', 'button.activar', (event) => {
-      const id = $(event.currentTarget).data('id');
-      this.activarUsuarioPorId(id);
-    });
-    
+      
   }
+
   ngOnDestroy(): void {
     if (this.dataTableInitialized) {
       ($('#tablaUsuarios') as any).DataTable().destroy();
@@ -147,13 +139,26 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.formUsuario.valid && this.usuarioEditandoId !== null) {
       const datosActualizados = {
         id_usuario: this.usuarioEditandoId,
-        ...this.formUsuario.value
+        correo: this.formUsuario.value.correo,
+        nombre: this.formUsuario.value.nombre,
+        id_rol: this.formUsuario.value.rol
       };
-      console.log('Actualizar usuario:', datosActualizados);
-      // servcio para actualizar el usuario
-      this.cerrarModal();
+  
+      console.log('datos de usuario por actualizar:', datosActualizados);
+  
+      this.usuarioService.actualizarUsuario(datosActualizados).subscribe({
+        next: (res) => {
+          console.log('Usuario actualizado:', res);
+          this.cerrarModal();
+          this.cargarUsuarios(); // refrescar tabla
+        },
+        error: (err) => {
+          console.error('Error al actualizar usuario:', err);
+        }
+      });
     }
   }
+  
 
   desactivarUsuario(usuario: UsuarioModel): void {
     this.usuarioService.deshabilitarUsuario(usuario.id_usuario).subscribe({
@@ -199,25 +204,23 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
                 data: null,
                 orderable: false,
                 render: (data: any, type: any, row: UsuarioModel) => {
-                  if (row.estado === 'Activo') {
-                    return `<button class="btn btn-outline-danger btn-sm desactivar" data-id="${row.id_usuario}">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                              <title>Desactivar</title>
-                              <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0A.5.5 0 0 1 8.5 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                              <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 1 1 0-2H6l1-1h2l1 1h3a1 1 0 0 1 1 1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118z"/>
-                              </svg>
-                              </svg>
+                    const estado = data.estado === 'Activo' ? 'desactivar' : 'activar';
+                    const colorBtn = data.estado === 'Activo' ? 'danger' : 'success';
+                    const titleBtn = data.estado === 'Activo' ? 'Deshabilitar Usuario' : 'Habilitar Usuario';
+                    return `
+                            <button class="btn btn-outline-warning btn-sm editar-usuario" data-id="${data.id_usuario}" title="Editar Usuario">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                  <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z"/>
+                                </svg>
+                            </button>
+      
+                            <button class="btn btn-outline-${colorBtn} btn-sm ${estado}-usuario" data-id="${data.id_usuario}" title="${titleBtn}">
+                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                  <path d="m482-200 114-113-114-113-42 42 43 43q-28 1-54.5-9T381-381q-20-20-30.5-46T340-479q0-17 4.5-34t12.5-33l-44-44q-17 25-25 53t-8 57q0 38 15 75t44 66q29 29 65 43.5t74 15.5l-38 38 42 42Zm165-170q17-25 25-53t8-57q0-38-14.5-75.5T622-622q-29-29-65.5-43T482-679l38-39-42-42-114 113 114 113 42-42-44-44q27 0 55 10.5t48 30.5q20 20 30.5 46t10.5 52q0 17-4.5 34T603-414l44 44ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
+                                </svg>
                             </button>
                             `;
-                  } else {
-                    return `<button class="btn btn-outline-success btn-sm activar" data-id="${row.id_usuario}">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                      <title>Activar</title>
-                        <path fill-rule="evenodd" d="M5.854 4.146a.5.5 0 0 1 0 .708L3.707 7H11.5A4.5 4.5 0 0 1 16 11.5a.5.5 0 0 1-1 0 3.5 3.5 0 0 0-3.5-3.5H3.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 0 1 .708 0z"/>
-                      </svg>
-                      
-                    </button>`;
-                  }
+                  
                 }
 
               }
@@ -236,16 +239,36 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
             scrollX: true
           });
   
-          // Aquí puedes agregar la captura de eventos para los botones:
-          $('#tablaUsuarios tbody').off('click').on('click', 'button.desactivar', (event) => {
-            const id = $(event.currentTarget).data('id');
-            this.desactivarUsuarioPorId(id);
-          });
-  
-          $('#tablaUsuarios tbody').on('click', 'button.activar', (event) => {
-            const id = $(event.currentTarget).data('id');
-            this.activarUsuarioPorId(id);
-          });
+          $('#tablaUsuarios tbody').off('click'); // quitar todos los handlers anteriores
+
+          $('#tablaUsuarios tbody').on('click', 'button.editar-usuario', (event) => {
+            //console.log('Botón de editar usuario clickeado');
+          const id = $(event.currentTarget).data('id');
+          const usuario = this.usuarios.find(u => u.id_usuario === id);
+          if (usuario) {
+            this.editando = true;
+            this.usuarioEditandoId = usuario.id_usuario;
+            this.modalVisible = true;
+        
+            this.formUsuario.setValue({
+              nombre: usuario.nombre,
+              correo: usuario.correo,
+              rol: usuario.id_rol
+            });
+          }
+        });
+        
+        $('#tablaUsuarios tbody').on('click', 'button.desactivar-usuario', (event) => {
+          const id = $(event.currentTarget).data('id');
+          this.desactivarUsuarioPorId(id);
+          //console.log('Usuario desactivado con ID:', id);
+        });
+        
+        $('#tablaUsuarios tbody').on('click', 'button.activar-usuario', (event) => {
+          const id = $(event.currentTarget).data('id');
+          this.activarUsuarioPorId(id);
+          //console.log('Usuario activado con ID:', id);
+        });
   
         } else {
           // Si ya está inicializada, actualizamos los datos
@@ -262,10 +285,12 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
 
   desactivarUsuarioPorId(id_usuario: number): void {
     this.usuarioService.deshabilitarUsuario(id_usuario).subscribe(() => this.cargarUsuarios());
+    //console.log('Usuario desactivado con ID:', id_usuario);
   }
   
   activarUsuarioPorId(id_usuario: number): void {
     this.usuarioService.habilitarUsuario(id_usuario).subscribe(() => this.cargarUsuarios());
+    //console.log('Usuario activado con ID:', id_usuario);
   }
 
 

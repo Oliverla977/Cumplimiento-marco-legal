@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from "rxjs";
 import { UsuarioModel } from "../model/usuario.model";
+import { UsuarioSimpleModel } from "../model/usuarioSimple.model";
 import { HttpClient } from '@angular/common/http';
 import { URL_API } from '../global/vars';
 @Injectable({
@@ -29,7 +30,7 @@ export class UsuarioService {
     return this.http.put(`${this.apiUrl}/usuarios/habilitar/${id_usuario}`, {});
   }
 
-  actualizarUsuario(usuario: UsuarioModel): Observable<any> {
-    return this.http.put(`${this.apiUrl}/actualizar/${usuario.id_usuario}`, usuario);
+  actualizarUsuario(usuario: UsuarioSimpleModel): Observable<any> {
+    return this.http.put(`${this.apiUrl}/usuarios/actualizar/${usuario.id_usuario}`, usuario);
   }
 }
