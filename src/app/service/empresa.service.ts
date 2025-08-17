@@ -1,30 +1,52 @@
 import { Injectable } from '@angular/core';
 import { EmpresaModel } from '../model/empresa.model';
 import { Observable, of } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { URL_API } from '../global/vars';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmpresaService {
   
-  private empresas:EmpresaModel[]=[
-    {id_empresa:1,nombre:'Empresa A',sector:'Tecnología', estado:'Habilitada'},
-    {id_empresa:2,nombre:'Empresa B',sector:'Salud', estado:'Habilitada'},
-    {id_empresa:3,nombre:'Empresa C',sector:'Educación', estado:'Deshabilitada'},
-    {id_empresa:4,nombre:'Empresa D',sector:'Finanzas', estado:'Habilitada'},
-    {id_empresa:5,nombre:'Empresa E',sector:'Manufactura', estado:'Habilitada'},
-    {id_empresa:6,nombre:'Empresa F',sector:'Comercio', estado:'Habilitada'},
-    {id_empresa:7,nombre:'Empresa G',sector:'Transporte', estado:'Habilitada'},
-    {id_empresa:8,nombre:'Empresa H',sector:'Energía', estado:'Habilitada'},
-    {id_empresa:9,nombre:'Empresa I',sector:'Turismo', estado:'Habilitada'},
-    {id_empresa:10,nombre:'Empresa J',sector:'Construcción', estado:'Habilitada'},
-    {id_empresa:11,nombre:'Empresa K',sector:'Agricultura', estado:'Habilitada'},
-    {id_empresa:12,nombre:'Empresa L',sector:'Telecomunicaciones', estado:'Deshabilitada'}
-  ]
+  // Use the global variable for the API URL
+  private apiUrl : string = URL_API;
 
-  constructor() { }
+  constructor(private http: HttpClient) { }
 
-  getEmpresas(): Observable<EmpresaModel[]> {
-    return of(this.empresas);
+  // POST /empresas/registro → Registrar nueva empresa
+  registrarEmpresa(empresa: EmpresaModel): Observable<any> {
+    return this.http.post(`${this.apiUrl}/empresas/registro`, empresa);
   }
+
+  // GET /empresas → Obtener todas las empresas
+  obtenerEmpresas(): Observable<{ success: boolean; data: EmpresaModel[] }> {
+    return this.http.get<{ success: boolean; data: EmpresaModel[] }>(`${this.apiUrl}/empresas`);
+  }
+
+  // GET /empresas/:id_empresa → Obtener empresa por ID
+  obtenerEmpresa(id_empresa: number): Observable<{ success: boolean; data: EmpresaModel }> {
+    return this.http.get<{ success: boolean; data: EmpresaModel }>(`${this.apiUrl}/empresas/${id_empresa}`);
+  }
+
+  // PUT /empresas/actualizar/:id_empresa → Actualizar empresa
+  actualizarEmpresa(id_empresa: number, empresa: EmpresaModel): Observable<any> {
+    return this.http.put(`${this.apiUrl}/empresas/actualizar/${id_empresa}`, empresa);
+  }
+
+  // PUT /empresas/deshabilitar/:id_empresa → Deshabilitar empresa
+  deshabilitarEmpresa(id_empresa: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/empresas/deshabilitar/${id_empresa}`, {});
+  }
+
+  // PUT /empresas/habilitar/:id_empresa → Habilitar empresa
+  habilitarEmpresa(id_empresa: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/empresas/habilitar/${id_empresa}`, {});
+  }
+
+  // POST /empresas/asignar-auditor → Asignar auditor a empresa
+  asignarAuditor(id_empresa: number, id_usuario: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/empresas/asignar-auditor`, { id_empresa, id_usuario });
+  }
+
 }

@@ -22,10 +22,14 @@ export class UsuarioService {
   }
 
   deshabilitarUsuario(id_usuario: number): Observable<any> {
-  return this.http.put(`${this.apiUrl}/usuarios/deshabilitar/${id_usuario}`, {});
-}
+    return this.http.put(`${this.apiUrl}/usuarios/deshabilitar/${id_usuario}`, {});
+  }
 
   habilitarUsuario(id_usuario: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/usuarios/habilitar/${id_usuario}`, {});
+  }
+
+  actualizarUsuario(usuario: UsuarioModel): Observable<any> {
+    return this.http.put(`${this.apiUrl}/actualizar/${usuario.id_usuario}`, usuario);
   }
 }
