@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, inject, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { cilBuilding, cilActionUndo, cilFolderOpen, cilTrash, cilZoom } from '@coreui/icons';
 import { EmpresaModel } from '../../../model/empresa.model';
+import { AuditorModel } from '../../../model/auditores.model';
+import { AuditorEmpresaModel } from '../../../model/auditoresEmpresa.model';
 import { EmpresaService } from '../../../service/empresa.service';
 import { IconSetService } from '@coreui/icons-angular';
 import { CommonModule } from '@angular/common';
@@ -9,8 +11,11 @@ import { IconDirective } from '@coreui/icons-angular';
 import { ModalModule } from '@coreui/angular';
 import { ListGroupDirective, ListGroupItemDirective, ProgressComponent  } from '@coreui/angular';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormSelectDirective } from '@coreui/angular';
 import $ from 'jquery';
 import 'datatables.net';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-empresas',
@@ -23,7 +28,9 @@ import 'datatables.net';
     ButtonCloseDirective,
     ListGroupDirective,
     ListGroupItemDirective,
-    ProgressComponent 
+    ProgressComponent,
+    FormSelectDirective,
+    FormsModule 
   ],
   templateUrl: './empresas.component.html',
   styleUrl: './empresas.component.scss',
@@ -41,8 +48,15 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
   //modal para ver detalle de empresa
   detalleEmpresa: EmpresaModel | null = null;
   modalEmpresaVisible: boolean = false;
+  idEmpresaSeleccionada: number | null = null;
   nombreEmpresa: string = '';
   sectorEmpresa: string = '';
+
+  modalAuditorVisible: boolean = false;
+  auditores: AuditorModel[] = [];
+  auditorSeleccionado: number = 0;
+  auditoresEmpresa: AuditorEmpresaModel[] = [];
+
 
   constructor(
     private empresaService: EmpresaService,
@@ -138,15 +152,62 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       next: (res) => {
         if (res.success) {
           this.detalleEmpresa = res.data;
+          this.idEmpresaSeleccionada = empresa.id_empresa;
           this.nombreEmpresa = res.data.nombre;
           this.sectorEmpresa = res.data.sector;
           this.modalEmpresaVisible = true;
+
+          this.traerAuditoresPorEmpresa(empresa.id_empresa);
         }
       },
       error: (err) => {
         console.error('Error obteniendo empresa:', err);
       }
     });
+  }
+
+  asignarAuditor(): void {
+    if (this.idEmpresaSeleccionada) {
+      this.modalAuditorVisible = true;
+      this.nombreEmpresa = this.detalleEmpresa?.nombre || '';
+      
+      this.empresaService.obtenerAuditores().subscribe({
+        next: (res) => {
+          if (res.success) {
+            this.auditores = res.data;
+            if (this.auditores.length > 0) {
+              this.auditorSeleccionado = this.auditores[0].id_usuario;
+            }
+          }
+        },
+        error: (err) => {
+          console.error('Error obteniendo auditores:', err);
+        }
+      })
+      
+    } else {
+      console.error('No hay empresa seleccionada para asignar auditor');
+    }
+  }
+
+  asignarAuditorEmpresa(): void {
+    if (this.idEmpresaSeleccionada) {
+      console.log('Asignando auditor a empresa ID:', this.idEmpresaSeleccionada);
+
+      this.empresaService.asignarAuditor(this.idEmpresaSeleccionada, this.auditorSeleccionado).subscribe({
+        next: (res) => {
+          console.log('Auditor asignado:', res);
+        },
+        error: (err) => {
+          console.error('Error asignando auditor:', err);
+        }
+      });
+
+      // Cerrar modal después de asignar
+      this.modalAuditorVisible = false;
+    } else {
+      console.error('No hay empresa seleccionada para asignar auditor');
+    }
   }
 
   cargarEmpresas(): void {
@@ -300,6 +361,20 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
   
+  traerAuditoresPorEmpresa(id_empresa: number): void {
+    console.log('Obteniendo auditores para empresa ID:', id_empresa);
+    this.empresaService.obtenerAuditoresPorEmpresa(id_empresa).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.auditoresEmpresa = res.data;
+          console.log('Auditores obtenidos:', this.auditoresEmpresa);
+        }
+      },
+      error: (err) => {
+        console.error('Error obteniendo auditores por empresa:', err);
+      }
+    });
+  }
   
 
 

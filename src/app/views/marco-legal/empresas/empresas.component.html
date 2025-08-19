@@ -73,7 +73,7 @@
 <!-- Modal vista de empresa (detalle, historial de evaluaciones y asignacion de auditor) -->
 <c-modal #detalleEmpresa id="detalleEmpresa" scrollable [(visible)]="modalEmpresaVisible" alignment="center">
   <c-modal-header>
-    <h5 cModalTitle>{{nombreEmpresa + ' - ' + sectorEmpresa}}</h5>
+    <h5 cModalTitle>{{idEmpresaSeleccionada + ' - ' + nombreEmpresa + ' - ' + sectorEmpresa}}</h5>
     <button [cModalToggle]="detalleEmpresa.id" cButtonClose></button>
   </c-modal-header>
   <c-modal-body>
@@ -93,15 +93,23 @@
         Auditores asignados:
       </div>
       <div class="col-6 text-end">
-        <button cButton color="primary" variant="outline" >
+        <button cButton color="primary" variant="outline" (click)="asignarAuditor()">
           Asignar Auditor
         </button>
       </div>
     </div>
     <div class="row mt-3 ps-2">
-      <ul cListGroup>
-        <li cListGroupItem>Oliver López - asignado el 10/04/2025</li>
+      <ul cListGroup *ngIf="auditoresEmpresa && auditoresEmpresa.length > 0; else sinAuditores">
+        <li *ngFor="let auditor of auditoresEmpresa" cListGroupItem>
+          {{ auditor.nombre }} - asignado el {{ auditor.fecha_asignacion | date:'dd/MM/yyyy' }}
+        </li>
       </ul>
+
+      <ng-template #sinAuditores>
+        <p class="text-muted">Sin auditores asignados</p>
+      </ng-template>
+
+
     </div>
   </div>
   <div class="container">
@@ -136,3 +144,39 @@
     </div>
   </div>
 </ng-template>
+
+<!-- Modal asignar auditor) -->
+<c-modal #AuditorEmpresa id="AuditorEmpresa" scrollable [(visible)]="modalAuditorVisible" alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Asignar Auditor a {{ nombreEmpresa }}</h5>
+    <button [cModalToggle]="AuditorEmpresa.id" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <ng-container *ngTemplateOutlet="vistaDetalleAuditorEmpresa"></ng-container>
+  </c-modal-body>
+  <c-modal-footer>
+    <button [cModalToggle]="AuditorEmpresa.id" cButton color="secondary">
+      Cerrar
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<ng-template #vistaDetalleAuditorEmpresa>
+  <div class="container">
+    <div class="row">
+      <div class="col-6 h5">
+        <select aria-label="Select" cSelect [(ngModel)]="auditorSeleccionado">
+          <option *ngFor="let auditor of auditores" [value]="auditor.id_usuario">
+            {{ auditor.nombre }}
+          </option>
+        </select>
+      </div>
+      <div class="col-6 text-end">
+        <button cButton color="primary" variant="outline" (click)="asignarAuditorEmpresa()">
+          Asignar
+        </button>
+      </div>
+    </div>
+    
+  </div>
+  </ng-template>

@@ -16,7 +16,7 @@ import {
 } from '@coreui/angular';
 
 //iconos extras
-import { cilUser, cil3d, cilBuilding } from '@coreui/icons';
+import { cilUser, cil3d, cilBuilding, cilBook, cilCheckCircle } from '@coreui/icons';
 
 import { DefaultFooterComponent, DefaultHeaderComponent } from './';
 import { navItems } from './_nav';
@@ -61,7 +61,9 @@ export class DefaultLayoutComponent implements OnInit {
       ...this.#iconSetService.icons,
       cilUser,
       cil3d,
-      cilBuilding
+      cilBuilding,
+      cilBook,
+      cilCheckCircle
     };
   }
 }

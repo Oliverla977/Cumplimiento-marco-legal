@@ -3,6 +3,8 @@ import { EmpresaModel } from '../model/empresa.model';
 import { Observable, of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { URL_API } from '../global/vars';
+import { AuditorModel } from '../model/auditores.model';
+import { AuditorEmpresaModel } from '../model/auditoresEmpresa.model';
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +48,17 @@ export class EmpresaService {
 
   // POST /empresas/asignar-auditor → Asignar auditor a empresa
   asignarAuditor(id_empresa: number, id_usuario: number): Observable<any> {
-    return this.http.post(`${this.apiUrl}/empresas/asignar-auditor`, { id_empresa, id_usuario });
+    return this.http.post(`${this.apiUrl}/auditores/asignar`, { id_empresa, id_usuario });
+  }
+
+   // GET /auditores → Obtener todos los audtores
+  obtenerAuditores(): Observable<{ success: boolean; data: AuditorModel[] }> {
+    return this.http.get<{ success: boolean; data: AuditorModel[] }>(`${this.apiUrl}/auditores`);
+  }
+
+   // GET /auditores/:id_empresa → Obtener auditores por empresa
+  obtenerAuditoresPorEmpresa(id_empresa: number): Observable<{ success: boolean; data: AuditorEmpresaModel[] }> {
+    return this.http.get<{ success: boolean; data: AuditorEmpresaModel[] }>(`${this.apiUrl}/auditores/empresa/${id_empresa}`);
   }
 
 }

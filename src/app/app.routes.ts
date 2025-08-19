@@ -40,6 +40,21 @@ export const routes: Routes = [
         loadChildren: () => import('./views/marco-legal/forgot-password/routes').then((m) => m.routes)
       },
       {
+        path: 'marcoslegales',
+        loadChildren: () => import('./views/marco-legal/marcos/routes').then((m) => m.routes),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'nuevomarcolegal',
+        loadChildren: () => import('./views/marco-legal/nuevomarcolegal/routes').then((m) => m.routes),
+        canActivate: [authGuard]
+      },
+      {
+        path: 'evaluaciones',
+        loadChildren: () => import('./views/marco-legal/evaluaciones/routes').then((m) => m.routes),
+        canActivate: [authGuard]
+      },
+      {
         path: 'theme',
         loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
       },
