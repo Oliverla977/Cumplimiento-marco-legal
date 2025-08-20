@@ -1,1 +1,94 @@
-<p>nuevomarcolegal works!</p>
+<form [formGroup]="marcoForm" (ngSubmit)="enviar()">
+
+  <!-- Datos del Marco Legal -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <strong>Datos del Marco Legal</strong>
+    </div>
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Nombre</label>
+          <input type="text" formControlName="nombre" class="form-control" placeholder="Nombre del marco legal">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">País de origen</label>
+          <input type="text" formControlName="pais_origen" class="form-control" placeholder="País de origen">
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <label class="form-label">Descripción</label>
+          <textarea formControlName="descripcion" rows="3" class="form-control" placeholder="Descripción"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Títulos -->
+  <div formArrayName="titulos" *ngFor="let titulo of titulos.controls; let i=index">
+    <div class="card mb-3 border-primary">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Título {{i + 1}}</strong>
+        <button type="button" class="btn btn-sm btn-danger" (click)="titulos.removeAt(i)">Eliminar Título</button>
+      </div>
+      <div class="card-body" [formGroupName]="i">
+        <input type="text" formControlName="nombre" class="form-control mb-2" placeholder="Nombre del título">
+        <button type="button" class="btn btn-sm btn-success" (click)="agregarCapitulo(i)">+ Agregar Capítulo</button>
+
+        <!-- Capítulos -->
+        <div formArrayName="capitulos" *ngFor="let capitulo of capitulos(i).controls; let j=index">
+          <div class="card mt-3 border-info" [formGroupName]="j">
+            <div class="card-header d-flex justify-content-between">
+              <strong>Capítulo {{j + 1}}</strong>
+              <button type="button" class="btn btn-sm btn-danger" (click)="capitulos(i).removeAt(j)">Eliminar Capítulo</button>
+            </div>
+            <div class="card-body">
+              <input type="text" formControlName="nombre" class="form-control mb-2" placeholder="Nombre del capítulo">
+              <button type="button" class="btn btn-sm btn-warning" (click)="agregarArticulo(i,j)">+ Agregar Artículo</button>
+
+              <!-- Artículos -->
+              <div formArrayName="articulos" *ngFor="let art of articulos(i,j).controls; let k=index">
+                <div class="card mt-2 border-secondary p-2" [formGroupName]="k">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="flex-grow-1">
+                      <input type="number" formControlName="numero" class="form-control mb-1" placeholder="Número">
+                      <input type="text" formControlName="nombre" class="form-control mb-1" placeholder="Nombre del artículo">
+                      <textarea formControlName="descripcion" rows="2" class="form-control mb-1" placeholder="Descripción"></textarea>
+                      <div class="form-check">
+                        <input type="checkbox" class="form-check-input" formControlName="aplicable">
+                        <label class="form-check-label">Aplicable</label>
+                      </div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger ms-2" (click)="articulos(i,j).removeAt(k)">Eliminar</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones finales -->
+  <div class="mt-3">
+    <button type="button" class="btn btn-primary" (click)="agregarTitulo()">+ Agregar Título</button>
+    <button type="submit" class="btn btn-success ms-2">Guardar Marco Legal</button>
+  </div>
+
+</form>
+
+<div class="position-relative">
+    <c-toaster placement="top-end" position="absolute">
+        <c-toast [autohide]="true" [delay]="3000" [visible]="showToast" [fade]="true">
+            <c-toast-header>
+                <strong class="me-auto">Sistema</strong>
+                <small class="ms-auto">Ahora</small>
+            </c-toast-header>
+            <c-toast-body> {{ MensajeToast}}</c-toast-body>
+        </c-toast>
+    </c-toaster>
+</div>

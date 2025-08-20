@@ -1,1 +1,73 @@
-<p>marcos works!</p>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col">
+            <h2>Marcos Legales</h2>
+        </div>
+    </div>
+  
+  <table id="tabla" class="display table table-bordered" style="width:100%">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nombre</th>
+        <th>País</th>
+        <th>Descripción</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let empresa of empresas">
+        <td>{{ empresa.id_empresa }}</td>
+        <td>{{ empresa.nombre }}</td>
+        <td>{{ empresa.pais }}</td>
+        <td>{{ empresa.id_estado }}</td>
+        <td class="text-center">
+
+          <button cButton color="secondary" variant="outline" class="me-2" title="Ver empresa">
+            <svg cIcon name="cil-zoom"></svg>
+          </button>
+
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+
+<!-- modal-marco-legal.component.html -->
+<!-- modal-marco-legal.component.html -->
+<c-modal [(visible)]="modalMarcoVisible" size="lg" backdrop="static">
+  <c-modal-header>
+    <c-modal-title>{{ marcoLegal?.nombre }}</c-modal-title>
+    <c-button close (click)="modalMarcoVisible = false"></c-button>
+  </c-modal-header>
+
+  <c-modal-body>
+    <p><strong>Descripción:</strong> {{ marcoLegal?.descripcion }}</p>
+    <p><strong>País de origen:</strong> {{ marcoLegal?.pais_origen }}</p>
+
+    <div *ngFor="let titulo of marcoLegal?.titulos" class="mb-3">
+      <h5 class="text-primary">{{ titulo.nombre }}</h5>
+
+      <div *ngFor="let capitulo of titulo.capitulos" class="ms-3 mb-2">
+        <h6 class="text-secondary">{{ capitulo.nombre }}</h6>
+
+        <ul class="list-group ms-3">
+          <li class="list-group-item" *ngFor="let articulo of capitulo.articulos">
+            <strong>Artículo {{ articulo.numero }}:</strong> {{ articulo.nombre }}<br>
+            <small>{{ articulo.descripcion }}</small><br>
+            <span class="badge" [ngClass]="{'bg-success': articulo.aplicable, 'bg-secondary': !articulo.aplicable}">
+              {{ articulo.aplicable ? 'Aplicable' : 'No aplicable' }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </c-modal-body>
+
+  <c-modal-footer>
+    <c-button color="secondary" (click)="modalMarcoVisible = false">Cerrar</c-button>
+  </c-modal-footer>
+</c-modal>
+
+
