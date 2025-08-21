@@ -4,33 +4,36 @@
       <c-col lg="7" md="9" xl="6">
         <c-card class="mx-4">
           <c-card-body class="p-4">
-            <form cForm>
-              <h1>Register</h1>
-              <p class="text-body-secondary">Create your account</p>
+            <form [formGroup]="resetForm" (ngSubmit)="reestablecerPassword()">
+              <h1>Reestablecer contraseña</h1>
+              <p class="text-body-secondary">
+                Recibirás un correo para poder actualizar tu contraseña
+              </p>
+
               <c-input-group class="mb-3">
-                <span cInputGroupText>
-                  <svg cIcon name="cilUser"></svg>
-                </span>
-                <input autoComplete="name" cFormControl placeholder="Username" />
+                <span cInputGroupText>@</span>
+                <input
+                  type="email"
+                  formControlName="email"
+                  cFormControl
+                  placeholder="Correo"
+                />
               </c-input-group>
+
               <c-input-group class="mb-3">
-                <span cInputGroupText>&#64;</span>
-                <input autoComplete="email" cFormControl placeholder="Email" />
+                <span cInputGroupText>@</span>
+                <input
+                  type="email"
+                  formControlName="confirmEmail"
+                  cFormControl
+                  placeholder="Confirma tu correo"
+                />
               </c-input-group>
-              <c-input-group class="mb-3">
-                <span cInputGroupText>
-                  <svg cIcon name="cilLockLocked"></svg>
-                </span>
-                <input autoComplete="new-password" cFormControl placeholder="Password" type="password" />
-              </c-input-group>
-              <c-input-group class="mb-4">
-                <span cInputGroupText>
-                  <svg cIcon name="cilLockLocked"></svg>
-                </span>
-                <input autoComplete="new-password" cFormControl placeholder="Repeat password" type="password" />
-              </c-input-group>
+
               <div class="d-grid">
-                <button cButton color="success">Create Account</button>
+                <button cButton color="success" type="submit" [disabled]="resetForm.invalid">
+                  Confirmar
+                </button>
               </div>
             </form>
           </c-card-body>

@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { LoginService } from '../../../service/login.service';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { IconDirective } from '@coreui/icons-angular';
+import { IconDirective, IconSetService } from '@coreui/icons-angular';
 import {
   AlertComponent,
   ButtonDirective,
@@ -18,6 +18,8 @@ import {
   RowComponent,
   SpinnerComponent
 } from '@coreui/angular';
+
+import { cilCheckCircle, cilX, cilLoopCircular } from '@coreui/icons';
 
 @Component({
   selector: 'app-new-password',
@@ -40,7 +42,7 @@ import {
   templateUrl: './new-password.component.html',
   styleUrl: './new-password.component.scss'
 })
-export class NewPasswordComponent {
+export class NewPasswordComponent implements OnInit {
 
   currentPassword: string = '';
   newPassword: string = '';
@@ -54,10 +56,21 @@ export class NewPasswordComponent {
   errorMessage: string = '';
   successMessage: string = '';
 
+  readonly #iconSetService = inject(IconSetService);
+
   constructor(
     private loginService: LoginService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    this.#iconSetService.icons = {
+      ...this.#iconSetService.icons,
+      cilCheckCircle,
+      cilX,
+      cilLoopCircular
+    };
+  }
 
   togglePasswordVisibility(field: 'current' | 'new' | 'confirm') {
     switch(field) {

@@ -36,10 +36,6 @@ export const routes: Routes = [
         canActivate: [authGuard]
       },
       {
-        path: 'forgotPassword',
-        loadChildren: () => import('./views/marco-legal/forgot-password/routes').then((m) => m.routes)
-      },
-      {
         path: 'marcoslegales',
         loadChildren: () => import('./views/marco-legal/marcos/routes').then((m) => m.routes),
         canActivate: [authGuard]
@@ -114,10 +110,10 @@ export const routes: Routes = [
     }
   },
   {
-    path: 'register',
+    path: 'forgotPassword',
     loadComponent: () => import('./views/pages/register/register.component').then(m => m.RegisterComponent),
     data: {
-      title: 'Register Page'
+      title: 'Recuperar contraseña'
     }
   },
   { path: '**', redirectTo: 'dashboard' }

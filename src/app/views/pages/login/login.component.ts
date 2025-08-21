@@ -60,6 +60,7 @@ export class LoginComponent implements OnInit {
               next: (res) => {
                 if (res.success) {
                   this.usuarioSesion = res.data;
+                  console.log("res data: ", res.data);
                   localStorage.setItem('usuarioSesion', JSON.stringify(this.usuarioSesion));
                   console.log('Usuario sesión:', this.usuarioSesion);
                 } else {
@@ -89,7 +90,7 @@ export class LoginComponent implements OnInit {
   }
 
   recuperar(){
-    this.router.navigate(['/recuperar']);
+    this.router.navigate(['/forgotPassword']);
   }
 
 }

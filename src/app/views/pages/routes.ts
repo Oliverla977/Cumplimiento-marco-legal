@@ -23,10 +23,10 @@ export const routes: Routes = [
     }
   },
   {
-    path: 'register',
+    path: 'forgotPassword',
     loadComponent: () => import('./register/register.component').then(m => m.RegisterComponent),
     data: {
-      title: 'Register Page'
+      title: 'Recuperar contraseña'
     }
   }
 ];

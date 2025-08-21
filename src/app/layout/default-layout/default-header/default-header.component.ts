@@ -155,11 +155,17 @@ export class DefaultHeaderComponent extends HeaderComponent {
   }
 
   //datos de localstorage
-  usuarioSesion = JSON.parse(localStorage.getItem('usuarioSesion') || 'null');
-  nombreUsuario = this.usuarioSesion[0].nombre || 'Usuario';
-  rolUsuario: number = this.usuarioSesion[0].id_rol || 0;
+  usuarioSesion: any[] = JSON.parse(localStorage.getItem('usuarioSesion') || '[]');
+  nombreUsuario: string = this.usuarioSesion.length ? this.usuarioSesion[0].nombre : 'Usuario';
+  rolUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_rol : 0;
+  idUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_usuario : 0;
+  
+
+  // rolUsuario = 0;
+  // nombreUsuario ='Usuario';
+  // idUsuario: number = 0;
+
   rolDescripcion = this.getDescripcionRol(this.rolUsuario);
-  idUsuario: number = this.usuarioSesion[0].id_usuario || 0;
 
   getDescripcionRol(rol: number): string {
     switch (rol) {
