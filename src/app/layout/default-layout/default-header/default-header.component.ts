@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, inject, input } from '@angular/core';
+import { Component, computed, inject, input, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { LoginService } from '../../../service/login.service';
 
@@ -48,7 +48,7 @@ import { IconDirective } from '@coreui/icons-angular';
     //BadgeComponent,
     DropdownDividerDirective]
 })
-export class DefaultHeaderComponent extends HeaderComponent {
+export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
 
   readonly #colorModeService = inject(ColorModeService);
   readonly colorMode = this.#colorModeService.colorMode;
@@ -154,18 +154,37 @@ export class DefaultHeaderComponent extends HeaderComponent {
     localStorage.removeItem('usuarioSesion');
   }
 
+
+  usuarioSesion: any = [];
+  nombreUsuario: string = "";
+  rolUsuario: number = 0;
+  idUsuario: number = 0;
+  rolDescripcion: string = "";
+
+  ngOnInit() {
+    this.loginService.usuarioSesion$.subscribe(usuario => {
+      this.usuarioSesion = usuario;
+      this.nombreUsuario = usuario.length ? usuario[0].nombre : 'Usuario';
+      this.rolUsuario = usuario.length ? usuario[0].id_rol : 0;
+      this.idUsuario = usuario.length ? usuario[0].id_usuario : 0;
+
+      this.rolDescripcion = this.getDescripcionRol(this.rolUsuario);
+
+    });
+  }
+  
+
   //datos de localstorage
-  usuarioSesion: any[] = JSON.parse(localStorage.getItem('usuarioSesion') || '[]');
-  nombreUsuario: string = this.usuarioSesion.length ? this.usuarioSesion[0].nombre : 'Usuario';
-  rolUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_rol : 0;
-  idUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_usuario : 0;
+  // usuarioSesion: any[] = JSON.parse(localStorage.getItem('usuarioSesion') || '[]');
+  // nombreUsuario: string = this.usuarioSesion.length ? this.usuarioSesion[0].nombre : 'Usuario';
+  // rolUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_rol : 0;
+  // idUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_usuario : 0;
   
 
   // rolUsuario = 0;
   // nombreUsuario ='Usuario';
   // idUsuario: number = 0;
 
-  rolDescripcion = this.getDescripcionRol(this.rolUsuario);
 
   getDescripcionRol(rol: number): string {
     switch (rol) {

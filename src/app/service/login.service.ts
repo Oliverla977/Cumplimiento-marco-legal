@@ -11,7 +11,7 @@ import {
   EmailAuthProvider,
   updateEmail
 } from '@angular/fire/auth';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +19,9 @@ import { Observable } from 'rxjs';
 export class LoginService {
 
   private auth = inject(Auth);
+
+  private usuarioSesionSubject = new BehaviorSubject<any[]>([]);
+  usuarioSesion$ = this.usuarioSesionSubject.asObservable();
 
   login(email: string, password: string): Promise<any> {
     return signInWithEmailAndPassword(this.auth, email, password);
@@ -118,6 +121,16 @@ export class LoginService {
             throw new Error('Error al actualizar correo: ' + error.message);
         }
       }
+    }
+
+    setUsuario(usuario: any[]) {
+      this.usuarioSesionSubject.next(usuario);
+      localStorage.setItem('usuarioSesion', JSON.stringify(usuario));
+    }
+  
+    loadFromLocalStorage() {
+      const data = JSON.parse(localStorage.getItem('usuarioSesion') || '[]');
+      this.usuarioSesionSubject.next(data);
     }
 
 }

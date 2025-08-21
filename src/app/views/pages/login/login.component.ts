@@ -61,8 +61,13 @@ export class LoginComponent implements OnInit {
                 if (res.success) {
                   this.usuarioSesion = res.data;
                   console.log("res data: ", res.data);
-                  localStorage.setItem('usuarioSesion', JSON.stringify(this.usuarioSesion));
+                  //localStorage.setItem('usuarioSesion', JSON.stringify(this.usuarioSesion));
+
+                  this.loginService.setUsuario(res.data);
+
                   console.log('Usuario sesión:', this.usuarioSesion);
+
+                  this.router.navigate(['/']);
                 } else {
                   console.error('Error al obtener el usuario desde el backend');
                 }
@@ -75,7 +80,7 @@ export class LoginComponent implements OnInit {
           }
         });
 
-        this.router.navigate(['/']);
+        
       })
       .catch(error =>{
         console.log("error: ", error);
