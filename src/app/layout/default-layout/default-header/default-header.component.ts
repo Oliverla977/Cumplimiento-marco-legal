@@ -151,6 +151,25 @@ export class DefaultHeaderComponent extends HeaderComponent {
   logout() {
     this.loginService.logout();
     this.router.navigate(['/login']);
+    localStorage.removeItem('usuarioSesion');
   }
+
+  //datos de localstorage
+  usuarioSesion = JSON.parse(localStorage.getItem('usuarioSesion') || 'null');
+  nombreUsuario = this.usuarioSesion[0].nombre || 'Usuario';
+  rolUsuario: number = this.usuarioSesion[0].id_rol || 0;
+  rolDescripcion = this.getDescripcionRol(this.rolUsuario);
+  idUsuario: number = this.usuarioSesion[0].id_usuario || 0;
+
+  getDescripcionRol(rol: number): string {
+    switch (rol) {
+      case 1: return 'Administrador';
+      case 2: return 'Digitador';
+      case 3: return 'Auditor';
+      case 4: return 'Supervisor';
+      default: return 'Desconocido';
+    }
+  }
+
 
 }

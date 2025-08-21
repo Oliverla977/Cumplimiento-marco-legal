@@ -37,4 +37,8 @@ export class UsuarioService {
   obtenerUsuario(id_usuario: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/usuarios/${id_usuario}`, {});
   }
+
+  userFirebase(uid: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/usuarios/firebase/auth`, {uid});
+  }
 }

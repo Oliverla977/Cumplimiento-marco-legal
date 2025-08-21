@@ -15,6 +15,10 @@ import { FormSelectDirective } from '@coreui/angular';
 import $ from 'jquery';
 import 'datatables.net';
 import { FormsModule } from '@angular/forms';
+import { MarcoLegalModel } from '../../../model/marcolegal.model';
+import { MarcolegalService } from '../../../service/marcolegal.service';
+import { EvaluacionService } from '../../../service/evaluacion.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -55,12 +59,29 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
   modalAuditorVisible: boolean = false;
   auditores: AuditorModel[] = [];
   auditorSeleccionado: number = 0;
-  auditoresEmpresa: AuditorEmpresaModel[] = [];
+  auditoresEmpresa: AuditorEmpresaModel[] = []; //auditores asignados a la empresa
 
+  modalAuditoriaVisible: boolean = false;
+  marcoLegalId: number = 0;
+  marcoLegalModel: MarcoLegalModel[] = [];
+
+
+  //datos de localstorage
+  usuarioSesion = JSON.parse(localStorage.getItem('usuarioSesion') || 'null');
+  nombreUsuario = this.usuarioSesion[0].nombre || 'Usuario';
+  rolUsuario: number = this.usuarioSesion[0].id_rol || 0;
+  idUsuario: number = this.usuarioSesion[0].id_usuario || 0;
+
+  //datos resumen
+  evaluaciones: any[] = [];
+  cargando: boolean = true;
 
   constructor(
     private empresaService: EmpresaService,
-    private fb: FormBuilder
+    private marcoService: MarcolegalService,
+    private evaluacionService: EvaluacionService,
+    private fb: FormBuilder,
+    private router: Router
   ){}
 
   ngOnInit(): void {
@@ -166,6 +187,52 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
+  auditarEmpresa(empresa: EmpresaModel): void {
+    this.marcoService.getMarcosLegales().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.marcoLegalModel = res.data;
+          this.idEmpresaSeleccionada = empresa.id_empresa;
+          this.nombreEmpresa = empresa.nombre;
+          this.modalAuditoriaVisible = true;
+
+          //this.traerAuditoresPorEmpresa(empresa.id_empresa);
+        }
+      },
+      error: (err) => {
+        console.error('Error obteniendo empresa:', err);
+      }
+    });
+  }
+
+  iniciarAuditoria(marcoLegalId: number): void {
+    if (!this.idEmpresaSeleccionada) {
+      console.error('No hay empresa seleccionada para iniciar auditoría');
+      return;
+    }
+    if (!marcoLegalId || marcoLegalId <= 0) {
+      console.error('No se ha seleccionado un marco legal para la auditoría');
+      return;
+    }
+    console.log('Iniciando auditoría para empresa ID:', this.idEmpresaSeleccionada, 'con marco legal ID:', marcoLegalId, 'por usuario ID:', this.idUsuario);
+
+    this.evaluacionService.iniciarEvaluacion(this.idEmpresaSeleccionada, marcoLegalId, this.idUsuario).subscribe({
+      next: (res) => {
+        console.log('Auditoría iniciada:', res);
+        console.log('ID Insertado para evaluacion: ',res.data.id)
+        this.modalAuditoriaVisible = false;
+        console.log('Redirigiendo a la vista de auditoría...');
+        //this.router.navigate(['/evaluaciones']);
+        this.router.navigate(['/evaluaciones', res.data.id, marcoLegalId]);
+
+      },
+      error: (err) => {
+        console.error('Error iniciando auditoría:', err);
+      }
+    });
+
+  }
+
   asignarAuditor(): void {
     if (this.idEmpresaSeleccionada) {
       this.modalAuditorVisible = true;
@@ -259,6 +326,12 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
                             <path d="m482-200 114-113-114-113-42 42 43 43q-28 1-54.5-9T381-381q-20-20-30.5-46T340-479q0-17 4.5-34t12.5-33l-44-44q-17 25-25 53t-8 57q0 38 15 75t44 66q29 29 65 43.5t74 15.5l-38 38 42 42Zm165-170q17-25 25-53t8-57q0-38-14.5-75.5T622-622q-29-29-65.5-43T482-679l38-39-42-42-114 113 114 113 42-42-44-44q27 0 55 10.5t48 30.5q20 20 30.5 46t10.5 52q0 17-4.5 34T603-414l44 44ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
                           </svg>
                       </button>
+
+                      <button class="btn btn-outline-info btn-sm auditar-empresa" data-id="${data.id_empresa}" title="Auditar Empresa">
+                          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                            <path d="M240-80q-50 0-85-35t-35-85v-120h120v-560h600v680q0 50-35 85t-85 35H240Zm480-80q17 0 28.5-11.5T760-200v-600H320v480h360v120q0 17 11.5 28.5T720-160ZM360-600v-80h360v80H360Zm0 120v-80h360v80H360ZM240-160h360v-80H200v40q0 17 11.5 28.5T240-160Zm0 0h-40 400-360Z"/>
+                          </svg>
+                      </button>
                     `
                   }}
                 ],
@@ -291,6 +364,7 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
             
                 if (button.hasClass('ver-empresa')) {
                   this.verDetalleEmpresa(empresa!);
+                  this.cargarResumen(id_empresa);
                 }
             
                 if (button.hasClass('editar-empresa')) {
@@ -303,6 +377,11 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.cambiarEstado(empresa.id_empresa, empresa.id_estado!);
                   }
                 }
+
+                if (button.hasClass('auditar-empresa')) {
+                  this.auditarEmpresa(empresa!);
+                }
+
               });
             }
           }, 200);
@@ -376,6 +455,37 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
   
+  cargarResumen(id_empresa: number): void {
+    this.evaluacionService.obtenerResumenEvaluaciones(id_empresa).subscribe({
+      next: (res) => {
+        console.log('Resumen de evaluaciones:', res.data);
+        this.evaluaciones = res.data || [];
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error al obtener resumen:', err);
+        this.evaluaciones = [];
+        this.cargando = false;
+      }
+    });
+    
+  }
 
+  // Formatear fecha a dd/MM/yyyy
+  formatFecha(fechaStr: string): string {
+    if (!fechaStr) return '';
+    const fecha = new Date(fechaStr);
+    const dia = String(fecha.getDate()).padStart(2, '0');
+    const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Mes base 0
+    const anio = fecha.getFullYear();
+    return `${dia}/${mes}/${anio}`;
+  }
+
+  // Determinar color del progreso según % de cumplimiento
+  getColor(porcentaje: number): string {
+    if (porcentaje < 50) return 'danger';
+    if (porcentaje < 80) return 'warning';
+    return 'success';
+  }
 
 }

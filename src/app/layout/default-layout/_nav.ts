@@ -40,11 +40,6 @@ export const navItems: INavData[] = [
         icon: 'nav-icon-bullet'
       }
     ]
-  },
-  {
-    name: 'Evaluaciones',
-    url: '/evaluaciones',
-    iconComponent: { name: 'cil-check-circle' }
   }//,
   // {
   //   title: true,

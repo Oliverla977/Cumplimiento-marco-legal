@@ -1,1 +1,47 @@
-<p>evaluaciones works!</p>
+<!-- Encabezado Marco Legal -->
+<div class="card mb-4 p-3">
+  <h2 class="mb-2">{{ marcoLegal?.nombre }}</h2>
+  <p class="mb-1"><strong>Descripción:</strong> {{ marcoLegal?.descripcion }}</p>
+  <p class="mb-0"><strong>País de origen:</strong> {{ marcoLegal?.pais_origen }}</p>
+</div>
+
+
+<div *ngFor="let titulo of marcoLegal?.titulos">
+  <h4 class="mt-3">{{ titulo.nombre }}</h4>
+
+  <div *ngFor="let capitulo of titulo.capitulos">
+    <h5 class="mt-2">{{ capitulo.nombre }}</h5>
+
+    <div *ngFor="let articulo of capitulo.articulos; let i = index" 
+         [formGroup]="asFormGroup(articulosFormArray.at(getArticuloIndex(titulo.id_titulo, capitulo.id_capitulo, articulo.id_articulo)))"
+         class="mb-4 p-3 border rounded">
+
+      <p><strong>Artículo {{articulo.numero}}:</strong> {{articulo.descripcion}}</p>
+
+      <!-- Radios -->
+      <div class="d-flex gap-3">
+        <label><input type="radio" [value]="1" formControlName="cumplimiento" /> Cumple</label>
+        <label><input type="radio" [value]="2" formControlName="cumplimiento" /> No cumple</label>
+        <label><input type="radio" [value]="3" formControlName="cumplimiento" /> Cumple parcialmente</label>
+        <label><input type="radio" [value]="4" formControlName="cumplimiento" /> N/A</label>
+      </div>
+
+      <!-- Observaciones -->
+      <div class="mt-2">
+        <label>Observaciones:</label>
+        <input type="text" class="form-control" formControlName="observacion" />
+      </div>
+
+      <!-- Evidencia -->
+      <!-- <div class="mt-2">
+        <label>Archivo de evidencia:</label>
+        <input type="file" class="form-control" (change)="onFileChange($event, getArticuloIndex(titulo.id_titulo, capitulo.id_capitulo, articulo.id_articulo))" />
+      </div> -->
+    </div>
+  </div>
+</div>
+
+<!-- Botón finalizar -->
+<div class="mt-4">
+  <button class="btn btn-primary" (click)="finalizarEvaluacion()">Finalizar Evaluación</button>
+</div>

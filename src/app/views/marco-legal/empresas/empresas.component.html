@@ -120,26 +120,25 @@
     </div>  
     <div class="row">
       <div class="col">
-        <ul cListGroup>
-          <li cListGroupItem>
-            <span>Marco legal evaluado: Convenio de Budapest</span>
+        <ul cListGroup *ngIf="evaluaciones.length > 0; else sinEvaluaciones">
+          <li cListGroupItem *ngFor="let eval of evaluaciones">
+            <span>Marco legal evaluado: {{ eval.marco_legal }}</span>
             <br>
-            <span class="text-muted">Fecha de evaluación: 01/01/2025</span>
-            <c-progress [animated]="true" [value]="25" color="danger" variant="striped">25%</c-progress>
-          </li>
-          <li cListGroupItem>
-            <span>Marco legal evaluado: Convenio de Budapest</span>
-            <br>
-            <span class="text-muted">Fecha de evaluación: 01/03/2025</span>
-            <c-progress [animated]="true" [value]="65" color="warning" variant="striped">65%</c-progress>
-          </li>
-          <li cListGroupItem>
-            <span>Marco legal evaluado: Convenio de Budapest</span>
-            <br>
-            <span class="text-muted">Fecha de evaluación: 01/06/2025</span>
-            <c-progress [animated]="true" [value]="95" color="success" variant="striped">95%</c-progress>
+            <span class="text-muted">Fecha de evaluación: {{ formatFecha(eval.fecha) }}</span>
+            <c-progress
+              [animated]="true"
+              [value]="eval.porcentaje_cumplimiento"
+              [color]="getColor(eval.porcentaje_cumplimiento)"
+              variant="striped">
+              {{ eval.porcentaje_cumplimiento }}%
+            </c-progress>
           </li>
         </ul>
+
+        <ng-template #sinEvaluaciones>
+          <p class="text-muted">Sin evaluaciones</p>
+        </ng-template>
+
       </div>
     </div>
   </div>
@@ -174,6 +173,42 @@
       <div class="col-6 text-end">
         <button cButton color="primary" variant="outline" (click)="asignarAuditorEmpresa()">
           Asignar
+        </button>
+      </div>
+    </div>
+    
+  </div>
+  </ng-template>
+
+  <!-- Modal Auditar empresa -->
+<c-modal #AuditarEmpresa id="AuditarEmpresa" scrollable [(visible)]="modalAuditoriaVisible" alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Iniciar Evaluación a: {{ nombreEmpresa }}</h5>
+    <button [cModalToggle]="AuditarEmpresa.id" cButtonClose></button>
+  </c-modal-header>
+  <c-modal-body>
+    <ng-container *ngTemplateOutlet="vistaDetalleAuditarEmpresa"></ng-container>
+  </c-modal-body>
+  <c-modal-footer>
+    <button [cModalToggle]="AuditarEmpresa.id" cButton color="secondary">
+      Cerrar
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<ng-template #vistaDetalleAuditarEmpresa>
+  <div class="container">
+    <div class="row">
+      <div class="col-6 h5">
+        <select aria-label="Select" cSelect [(ngModel)]="marcoLegalId">
+          <option *ngFor="let marcolegal of marcoLegalModel" [value]="marcolegal.id_marco_legal">
+            {{ marcolegal.nombre }}
+          </option>
+        </select>
+      </div>
+      <div class="col-6 text-end">
+        <button cButton color="primary" variant="outline" (click)="iniciarAuditoria(marcoLegalId)">
+          Iniciar Evaluación
         </button>
       </div>
     </div>

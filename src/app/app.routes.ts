@@ -50,7 +50,7 @@ export const routes: Routes = [
         canActivate: [authGuard]
       },
       {
-        path: 'evaluaciones',
+        path: 'evaluaciones/:id/:marcoLegalId',
         loadChildren: () => import('./views/marco-legal/evaluaciones/routes').then((m) => m.routes),
         canActivate: [authGuard]
       },

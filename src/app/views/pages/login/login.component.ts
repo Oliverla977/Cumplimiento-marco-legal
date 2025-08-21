@@ -18,6 +18,8 @@ import {
   InputGroupTextDirective,
   RowComponent
 } from '@coreui/angular';
+import { UsuarioService } from '../../../service/usuario.service';
+import { UsuarioSesionModel } from '../../../model/usuarioSesion.model';
 
 @Component({
   selector: 'app-login',
@@ -29,10 +31,12 @@ export class LoginComponent implements OnInit {
   email: string = '';
   password: string = '';
  
+  usuarioSesion: UsuarioSesionModel = null!;
 
   constructor(
     private router: Router,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private userService: UsuarioService
   ) { }
 
   ngOnInit(): void {
@@ -46,6 +50,30 @@ export class LoginComponent implements OnInit {
   login(){
     this.loginService.login(this.email, this.password)
       .then( () => {
+
+        this.loginService.getAuth().subscribe(auth => {
+          if (auth) {
+            console.log('Usuario autenticado:', auth.email);
+            console.log('UID:', auth.uid);
+
+            this.userService.userFirebase(auth.uid).subscribe({
+              next: (res) => {
+                if (res.success) {
+                  this.usuarioSesion = res.data;
+                  localStorage.setItem('usuarioSesion', JSON.stringify(this.usuarioSesion));
+                  console.log('Usuario sesión:', this.usuarioSesion);
+                } else {
+                  console.error('Error al obtener el usuario desde el backend');
+                }
+              },
+              error: (err) => {
+                console.error('Error en la solicitud al backend:', err);
+              }
+            });
+
+          }
+        });
+
         this.router.navigate(['/']);
       })
       .catch(error =>{
@@ -57,7 +85,7 @@ export class LoginComponent implements OnInit {
     this.email = f.value.email;
     this.password = f.value.password;
     this.login();
-    console.log(f.value);
+    //console.log(f.value);
   }
 
   recuperar(){
