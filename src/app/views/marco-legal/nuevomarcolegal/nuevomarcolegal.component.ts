@@ -3,19 +3,21 @@ import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
+  ButtonCloseDirective,
   ButtonDirective,
-  CardBodyComponent,
-  CardComponent,
-  CardImgDirective,
-  CardTextDirective,
-  CardTitleDirective,
-  CardHeaderComponent,
-  RowComponent,
-  ColComponent,
-  FormLabelDirective,
-  FormCheckComponent
+  ModalBodyComponent,
+  ModalComponent,
+  ModalFooterComponent,
+  ModalHeaderComponent,
+  ModalTitleDirective
 } from '@coreui/angular';
 import { ToastBodyComponent, ToastComponent, ToastHeaderComponent, ToasterComponent } from '@coreui/angular';
+import { TextColorDirective, TooltipDirective } from '@coreui/angular';
+// CoreUI
+import { ModalModule } from '@coreui/angular';
+import { ButtonModule } from '@coreui/angular';
+import { FormModule } from '@coreui/angular';
+import { AlertModule } from '@coreui/angular';
 
 
 import { MarcolegalService } from '../../../service/marcolegal.service';
@@ -29,7 +31,15 @@ import { MarcolegalService } from '../../../service/marcolegal.service';
     ToastComponent,
     ToastHeaderComponent,
     ToastBodyComponent,
-    ToasterComponent
+    ToasterComponent, TooltipDirective, TextColorDirective,
+    ModalComponent,
+    ModalHeaderComponent,
+    ModalTitleDirective,
+    ButtonCloseDirective,
+    ModalBodyComponent,
+    ModalFooterComponent,
+    ButtonDirective,
+    ModalModule, ButtonModule, FormModule, AlertModule
   ],
   templateUrl: './nuevomarcolegal.component.html',
   styleUrl: './nuevomarcolegal.component.scss'
@@ -39,6 +49,10 @@ export class NuevomarcolegalComponent implements OnInit {
     marcoForm!: FormGroup;
     showToast = false;
     MensajeToast: string = '';
+
+    jsonData: any = null;
+    modalJsonVisible = false;
+
 
   
     constructor(private fb: FormBuilder, private marcoService: MarcolegalService) { }
@@ -126,6 +140,38 @@ export class NuevomarcolegalComponent implements OnInit {
     });
 
     }
+
+    onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        this.jsonData = JSON.parse(e.target.result);
+        console.log('JSON cargado:', this.jsonData);
+      } catch (error) {
+        console.error('Archivo JSON inválido:', error);
+        this.jsonData = null;
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  enviarJson() {
+    if (!this.jsonData) return;
+
+    this.marcoService.registrarMarcoLegal(this.jsonData).subscribe({
+      next: (res) => {
+        console.log('Registrado correctamente:', res);
+        this.jsonData = null;
+        this.modalJsonVisible = false;
+      },
+      error: (err) => {
+        console.error('Error al registrar JSON:', err);
+      },
+    });
+  }
 
     
 }

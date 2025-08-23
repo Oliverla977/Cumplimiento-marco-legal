@@ -77,6 +77,17 @@
   <div class="mt-3">
     <button type="button" class="btn btn-primary" (click)="agregarTitulo()">+ Agregar Título</button>
     <button type="submit" class="btn btn-success ms-2">Guardar Marco Legal</button>
+    <button
+      cTooltipPlacement="top"
+      cTooltip="Puedes cargar un marco legal en formato json para una carga masiva de los articulos."
+      type="button"
+      class="btn btn-info ms-2"
+      (click)="modalJsonVisible = true">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+        <path d="M440-160v-326L336-382l-56-58 200-200 200 200-56 58-104-104v326h-80ZM160-600v-120q0-33 23.5-56.5T240-800h480q33 0 56.5 23.5T800-720v120h-80v-120H240v120h-80Z"/>
+      </svg>
+        Cargar JSON
+    </button>
   </div>
 
 </form>
@@ -92,3 +103,38 @@
         </c-toast>
     </c-toaster>
 </div>
+
+<!-- Modal -->
+<!-- Modal Cargar JSON -->
+<c-modal #CargarJson id="CargarJson" scrollable [(visible)]="modalJsonVisible" alignment="center">
+  <c-modal-header>
+    <h5 cModalTitle>Cargar Marco Legal desde JSON</h5>
+    <button [cModalToggle]="CargarJson.id" cButtonClose></button>
+  </c-modal-header>
+
+  <c-modal-body>
+    <ng-container *ngTemplateOutlet="vistaCargarJson"></ng-container>
+  </c-modal-body>
+
+  <c-modal-footer>
+    <button [cModalToggle]="CargarJson.id" cButton color="secondary">
+      Cancelar
+    </button>
+    <button cButton color="success" (click)="enviarJson()" [disabled]="!jsonData">
+      Enviar
+    </button>
+  </c-modal-footer>
+</c-modal>
+
+<ng-template #vistaCargarJson>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mb-3">
+        <input type="file" cFormControl (change)="onFileSelected($event)" accept=".json" />
+      </div>
+      <div class="col-12" *ngIf="jsonData">
+        <c-alert color="info">✅ Archivo JSON cargado correctamente</c-alert>
+      </div>
+    </div>
+  </div>
+</ng-template>
