@@ -3,7 +3,7 @@
         <div class="col">
             <h2>Empresas</h2>
         </div>
-        <div class="col text-end">
+        <div class="col text-end" *ngIf="rolUsuario === 1 || rolUsuario === 2">
             <button cButton color="success" variant="outline" (click)="abrirModal()" >
                 <svg cIcon class="me-2" name="cil-building"></svg>
                 Nueva Empresa
@@ -92,7 +92,7 @@
       <div class="col-6 h5">
         Auditores asignados:
       </div>
-      <div class="col-6 text-end">
+      <div class="col-6 text-end" *ngIf="rolUsuario === 1 || rolUsuario === 2">
         <button cButton color="primary" variant="outline" (click)="asignarAuditor()">
           Asignar Auditor
         </button>
@@ -126,6 +126,8 @@
             <br>
             <span class="text-muted">Fecha de evaluación: {{ formatFecha(eval.fecha) }}</span>
             <c-progress
+             cTooltipPlacement="top"
+             [cTooltip]="tooltipContent"
               [animated]="true"
               [value]="eval.porcentaje_cumplimiento"
               [color]="getColor(eval.porcentaje_cumplimiento)"
@@ -134,6 +136,14 @@
             </c-progress>
           </li>
         </ul>
+
+        <ng-template #tooltipContent>
+          (0-20%): Nivel principiante<br>
+          (21-40%): Nivel parcial<br>
+          (41-60%): Nivel intermedio<br>
+          (61-80%): Nivel avanzado<br>
+          (81-100%): Nivel Consolidado<br>
+        </ng-template>
 
         <ng-template #sinEvaluaciones>
           <p class="text-muted">Sin evaluaciones</p>

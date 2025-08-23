@@ -22,12 +22,14 @@ export const routes: Routes = [
       {
         path: 'usuarios',
         loadChildren: () => import('./views/marco-legal/usuarios/routes').then((m) => m.routes),
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { roles: [1] } //acceso solo a rol 1 (admin)
       },
       {
         path: 'empresas',
         loadChildren: () => import('./views/marco-legal/empresas/routes').then((m) => m.routes),
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { roles: [1,2,3,4] } //todos pueden acceder pero con diferentes niveles de acceso
       },
       // New Password and Forgot Password routes
       {
@@ -38,17 +40,20 @@ export const routes: Routes = [
       {
         path: 'marcoslegales',
         loadChildren: () => import('./views/marco-legal/marcos/routes').then((m) => m.routes),
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { roles: [1,2,3,4] } //datos de lectura, disponibles para cualquiera
       },
       {
         path: 'nuevomarcolegal',
         loadChildren: () => import('./views/marco-legal/nuevomarcolegal/routes').then((m) => m.routes),
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { roles: [1,2] } //solo admin y digitador
       },
       {
         path: 'evaluaciones/:id/:marcoLegalId',
         loadChildren: () => import('./views/marco-legal/evaluaciones/routes').then((m) => m.routes),
-        canActivate: [authGuard]
+        canActivate: [authGuard],
+        data: { roles: [1,3] } //solo admin y auditor
       },
       {
         path: 'theme',
@@ -96,10 +101,10 @@ export const routes: Routes = [
     }
   },
   {
-    path: '500',
+    path: '403',
     loadComponent: () => import('./views/pages/page500/page500.component').then(m => m.Page500Component),
     data: {
-      title: 'Page 500'
+      title: 'Page 403'
     }
   },
   {

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { Auth, onAuthStateChanged } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
 
@@ -9,11 +9,27 @@ export class AuthGuardService {
 
   constructor(private router: Router) {}
 
-  canActivate(): Observable<boolean> {
+  canActivate(route: ActivatedRouteSnapshot): Observable<boolean> {
     return new Observable<boolean>(observer => {
       const unsubscribe = onAuthStateChanged(this.auth, user => {
         if (user) {
-          observer.next(true);
+
+           // usuario autenticado, revisamos rol
+          const usuarioSesion = JSON.parse(localStorage.getItem('usuarioSesion') || '[]');
+          const rolUsuario = usuarioSesion.length ? usuarioSesion[0].id_rol : 0;
+
+          const rolesPermitidos = route.data['roles'] as number[] | undefined;
+
+
+          if (!rolesPermitidos || rolesPermitidos.includes(rolUsuario)) {
+            observer.next(true);
+          } else {
+            this.router.navigate(['/403']);
+            observer.next(false);
+          }
+
+
+          //observer.next(true);
         } else {
           this.router.navigate(['/login']);
           observer.next(false);

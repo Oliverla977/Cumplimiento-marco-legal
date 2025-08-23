@@ -9,10 +9,10 @@ export const routes: Routes = [
     }
   },
   {
-    path: '500',
+    path: '403',
     loadComponent: () => import('./page500/page500.component').then(m => m.Page500Component),
     data: {
-      title: 'Page 500'
+      title: 'Page 403'
     }
   },
   {

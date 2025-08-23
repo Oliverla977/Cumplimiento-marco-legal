@@ -20,7 +20,9 @@ export class LoginService {
 
   private auth = inject(Auth);
 
-  private usuarioSesionSubject = new BehaviorSubject<any[]>([]);
+  private usuarioSesionSubject = new BehaviorSubject<any[]>(
+    JSON.parse(localStorage.getItem('usuarioSesion') || '[]')
+  );
   usuarioSesion$ = this.usuarioSesionSubject.asObservable();
 
   login(email: string, password: string): Promise<any> {

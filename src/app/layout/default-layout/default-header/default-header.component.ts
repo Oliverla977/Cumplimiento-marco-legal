@@ -174,18 +174,6 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
   }
   
 
-  //datos de localstorage
-  // usuarioSesion: any[] = JSON.parse(localStorage.getItem('usuarioSesion') || '[]');
-  // nombreUsuario: string = this.usuarioSesion.length ? this.usuarioSesion[0].nombre : 'Usuario';
-  // rolUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_rol : 0;
-  // idUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_usuario : 0;
-  
-
-  // rolUsuario = 0;
-  // nombreUsuario ='Usuario';
-  // idUsuario: number = 0;
-
-
   getDescripcionRol(rol: number): string {
     switch (rol) {
       case 1: return 'Administrador';
@@ -196,5 +184,16 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
     }
   }
 
+    //datos de localstorage
+  // usuarioSesion: any[] = JSON.parse(localStorage.getItem('usuarioSesion') || '[]');
+  // nombreUsuario: string = this.usuarioSesion.length ? this.usuarioSesion[0].nombre : 'Usuario';
+  // rolUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_rol : 0;
+  // idUsuario: number = this.usuarioSesion.length ? this.usuarioSesion[0].id_usuario : 0;
+  
+
+  // rolUsuario = 0;
+  // nombreUsuario ='Usuario';
+  // idUsuario: number = 0;
+  
 
 }

@@ -19,6 +19,7 @@ import { MarcoLegalModel } from '../../../model/marcolegal.model';
 import { MarcolegalService } from '../../../service/marcolegal.service';
 import { EvaluacionService } from '../../../service/evaluacion.service';
 import { Router } from '@angular/router';
+import { TooltipDirective } from '@coreui/angular';
 
 
 @Component({
@@ -34,7 +35,8 @@ import { Router } from '@angular/router';
     ListGroupItemDirective,
     ProgressComponent,
     FormSelectDirective,
-    FormsModule 
+    FormsModule,
+    TooltipDirective
   ],
   templateUrl: './empresas.component.html',
   styleUrl: './empresas.component.scss',
@@ -308,6 +310,11 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
                       const estado = data.id_estado === 1 ? 'desactivar-empresa' : 'activar-empresa';
                       const colorBtn = data.id_estado === 1 ? 'danger' : 'success';
                       const titleBtn = data.id_estado === 1 ? 'Deshabilitar Empresa' : 'Habilitar Empresa';
+                      const btnEditar  = (this.rolUsuario === 1 || this.rolUsuario === 2) ? '' : 'd-none';
+                      const btnEstado  = (this.rolUsuario === 1 || this.rolUsuario === 2) ? '' : 'd-none';
+                      const btnAuditar = (this.rolUsuario === 1 || this.rolUsuario === 3) ? '' : 'd-none';
+
+                      console.log("Rol  en acceso a btn: ",this.rolUsuario);
                       return `
                       <button class="btn btn-outline-secondary btn-sm ver-empresa" data-id="${data.id_empresa}" title="Ver Empresa">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
@@ -315,19 +322,19 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
                           </svg>
                       </button>
 
-                      <button class="btn btn-outline-warning btn-sm editar-empresa" data-id="${data.id_empresa}" title="Editar Empresa">
+                      <button class="btn btn-outline-warning btn-sm editar-empresa ${btnEditar}" data-id="${data.id_empresa}" title="Editar Empresa">
                           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                             <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z"/>
                           </svg>
                       </button>
 
-                      <button class="btn btn-outline-${colorBtn} btn-sm estado-empresa" data-id="${data.id_empresa}" title="${titleBtn}">
+                      <button class="btn btn-outline-${colorBtn} btn-sm estado-empresa ${btnEstado}" data-id="${data.id_empresa}" title="${titleBtn}">
                           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                             <path d="m482-200 114-113-114-113-42 42 43 43q-28 1-54.5-9T381-381q-20-20-30.5-46T340-479q0-17 4.5-34t12.5-33l-44-44q-17 25-25 53t-8 57q0 38 15 75t44 66q29 29 65 43.5t74 15.5l-38 38 42 42Zm165-170q17-25 25-53t8-57q0-38-14.5-75.5T622-622q-29-29-65.5-43T482-679l38-39-42-42-114 113 114 113 42-42-44-44q27 0 55 10.5t48 30.5q20 20 30.5 46t10.5 52q0 17-4.5 34T603-414l44 44ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/>
                           </svg>
                       </button>
 
-                      <button class="btn btn-outline-info btn-sm auditar-empresa" data-id="${data.id_empresa}" title="Auditar Empresa">
+                      <button class="btn btn-outline-info btn-sm auditar-empresa ${btnAuditar}" data-id="${data.id_empresa}" title="Auditar Empresa">
                           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                             <path d="M240-80q-50 0-85-35t-35-85v-120h120v-560h600v680q0 50-35 85t-85 35H240Zm480-80q17 0 28.5-11.5T760-200v-600H320v480h360v120q0 17 11.5 28.5T720-160ZM360-600v-80h360v80H360Zm0 120v-80h360v80H360ZM240-160h360v-80H200v40q0 17 11.5 28.5T240-160Zm0 0h-40 400-360Z"/>
                           </svg>
@@ -483,9 +490,24 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
 
   // Determinar color del progreso según % de cumplimiento
   getColor(porcentaje: number): string {
-    if (porcentaje < 50) return 'danger';
-    if (porcentaje < 80) return 'warning';
-    return 'success';
+  if (porcentaje >= 0 && porcentaje <= 20) {
+    return 'danger';        // Nivel 1 - Principiante: Rojo
   }
+  if (porcentaje >= 21 && porcentaje <= 40) {
+    return 'warning';       // Nivel 2 - Parcial: Naranja/Amarillo
+  }
+  if (porcentaje >= 41 && porcentaje <= 60) {
+    return 'info';        // Nivel 3 - Intermedio: Azul o color intermedio
+  }
+  if (porcentaje >= 61 && porcentaje <= 80) {
+    return 'primary';       // Nivel 4 - Avanzado: Azul primario
+  }
+  if (porcentaje >= 81 && porcentaje <= 100) {
+    return 'success';       // Nivel 5 - Consolidado: Verde
+  }
+  
+  // Valor por defecto para casos fuera del rango esperado
+  return 'secondary';
+}
 
 }
