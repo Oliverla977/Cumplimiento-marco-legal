@@ -109,6 +109,9 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
         this.usuarioService.registrarUsuario(usuarioMysql).subscribe({
           next: (res) => {
             console.log('Usuario guardado en MySQL', res);
+
+            //this.loginService.logout();
+
             this.cerrarModal();
             this.cargarUsuarios();
           },

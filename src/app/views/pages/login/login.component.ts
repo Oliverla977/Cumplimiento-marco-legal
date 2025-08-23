@@ -42,7 +42,10 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
     this.loginService.getAuth().subscribe(auth =>{
       if(auth){
-        this.router.navigate(['/']);
+        //this.router.navigate(['/']);
+        if (this.router.url === '/login') {
+            this.router.navigate(['/']);
+          }
       }
     })
   }
@@ -59,15 +62,24 @@ export class LoginComponent implements OnInit {
             this.userService.userFirebase(auth.uid).subscribe({
               next: (res) => {
                 if (res.success) {
-                  this.usuarioSesion = res.data;
-                  console.log("res data: ", res.data);
-                  //localStorage.setItem('usuarioSesion', JSON.stringify(this.usuarioSesion));
+                  if (res.data && res.data.length > 0) {
+                      // Solo si trae info, lo guardamos
+                      this.usuarioSesion = res.data;
+                      console.log("res data: ", res.data);
+              
+                      this.loginService.setUsuario(res.data);
+                      //this.router.navigate(['/']);
+                      console.log('Usuario sesión:', this.usuarioSesion);
 
-                  this.loginService.setUsuario(res.data);
+                      
+                    } else {
+                      console.warn("No se encontraron datos de usuario en backend, se conserva la sesión anterior");
+                    }
 
-                  console.log('Usuario sesión:', this.usuarioSesion);
-
-                  this.router.navigate(['/']);
+                    if (this.router.url === '/login') {
+                        this.router.navigate(['/']);
+                      }
+                  
                 } else {
                   console.error('Error al obtener el usuario desde el backend');
                 }

@@ -169,6 +169,7 @@ export class DefaultHeaderComponent extends HeaderComponent implements OnInit {
       this.idUsuario = usuario.length ? usuario[0].id_usuario : 0;
 
       this.rolDescripcion = this.getDescripcionRol(this.rolUsuario);
+      console.log("Se llama OnInit de header con valores:", this.usuarioSesion);
 
     });
   }

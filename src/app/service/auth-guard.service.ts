@@ -14,6 +14,8 @@ export class AuthGuardService {
       const unsubscribe = onAuthStateChanged(this.auth, user => {
         if (user) {
 
+          console.log("user en guard: ", user);
+
            // usuario autenticado, revisamos rol
           const usuarioSesion = JSON.parse(localStorage.getItem('usuarioSesion') || '[]');
           const rolUsuario = usuarioSesion.length ? usuarioSesion[0].id_rol : 0;
