@@ -274,6 +274,7 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
 
       // Cerrar modal después de asignar
       this.modalAuditorVisible = false;
+      this.modalEmpresaVisible = false;
     } else {
       console.error('No hay empresa seleccionada para asignar auditor');
     }
