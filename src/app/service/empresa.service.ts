@@ -61,4 +61,10 @@ export class EmpresaService {
     return this.http.get<{ success: boolean; data: AuditorEmpresaModel[] }>(`${this.apiUrl}/auditores/empresa/${id_empresa}`);
   }
 
+  // GET /empresas/auditor/:id_usuario/empresas → Obtener empresas asignadas a un auditor
+  obtenerEmpresasPorAuditor(id_usuario: number): Observable<{ success: boolean; data: any[] }> {
+    return this.http.get<{ success: boolean; data: any[] }>(`${this.apiUrl}/empresas/auditores/${id_usuario}/empresas`);
+  }
+
+
 }

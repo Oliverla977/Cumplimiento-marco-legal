@@ -74,6 +74,9 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
   rolUsuario: number = this.usuarioSesion[0].id_rol || 0;
   idUsuario: number = this.usuarioSesion[0].id_usuario || 0;
 
+  //lista de empresas asignadas al auditor
+  listaEmpresasAuditor: number[] = [];
+
   //datos resumen
   evaluaciones: any[] = [];
   cargando: boolean = true;
@@ -94,8 +97,8 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       pais: ['', Validators.required] 
     });
 
+    this.cargarEmpresasAuditor();
     this.cargarEmpresas();
-
 
     this.#iconSetService.icons = {
       ...this.#iconSetService.icons,
@@ -314,6 +317,9 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
                       const btnEditar  = (this.rolUsuario === 1 || this.rolUsuario === 2) ? '' : 'd-none';
                       const btnEstado  = (this.rolUsuario === 1 || this.rolUsuario === 2) ? '' : 'd-none';
                       const btnAuditar = (this.rolUsuario === 1 || this.rolUsuario === 3) ? '' : 'd-none';
+                      const disabledAuditar2 = this.empresaAsignada(data.id_empresa) ? '' : 'disabled';
+                      const disabledAuditar = this.listaEmpresasAuditor.includes(data.id_empresa) ? '' : 'disabled';
+                      console.log("Empresas asignadas al auditor: ",this.listaEmpresasAuditor);
 
                       console.log("Rol  en acceso a btn: ",this.rolUsuario);
                       return `
@@ -335,7 +341,7 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
                           </svg>
                       </button>
 
-                      <button class="btn btn-outline-info btn-sm auditar-empresa ${btnAuditar}" data-id="${data.id_empresa}" title="Auditar Empresa">
+                      <button class="btn btn-outline-info btn-sm auditar-empresa ${btnAuditar} ${disabledAuditar}" data-id="${data.id_empresa}" title="Auditar Empresa">
                           <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                             <path d="M240-80q-50 0-85-35t-35-85v-120h120v-560h600v680q0 50-35 85t-85 35H240Zm480-80q17 0 28.5-11.5T760-200v-600H320v480h360v120q0 17 11.5 28.5T720-160ZM360-600v-80h360v80H360Zm0 120v-80h360v80H360ZM240-160h360v-80H200v40q0 17 11.5 28.5T240-160Zm0 0h-40 400-360Z"/>
                           </svg>
@@ -510,5 +516,22 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
   // Valor por defecto para casos fuera del rango esperado
   return 'secondary';
 }
+
+cargarEmpresasAuditor(): void {
+    this.empresaService.obtenerEmpresasPorAuditor(this.idUsuario).subscribe({
+      next: (res) => {
+        this.listaEmpresasAuditor = res.data.map(e => e.id_empresa);
+        console.log('Empresas asignadas al auditor:', this.listaEmpresasAuditor);
+      },
+      error: (err) => {
+        console.error('Error al cargar empresas del auditor:', err);
+      }
+    });
+  }
+
+  //Función para saber si una empresa está en la lista
+  empresaAsignada(id_empresa: number): boolean {
+    return this.listaEmpresasAuditor.includes(id_empresa);
+  }
 
 }
