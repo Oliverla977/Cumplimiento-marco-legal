@@ -22,7 +22,12 @@ import {
   ModalHeaderComponent,
   ModalTitleDirective
 } from '@coreui/angular';
-
+import {
+  AccordionButtonDirective,
+  AccordionComponent,
+  AccordionItemComponent,
+  TemplateIdDirective
+} from '@coreui/angular'
 // CoreUI Angular
 import { ButtonModule } from '@coreui/angular'; // incluye c-button
 
@@ -48,7 +53,11 @@ import { ButtonModule } from '@coreui/angular'; // incluye c-button
     ModalBodyComponent,
     ModalFooterComponent,
     ButtonDirective,
-    ButtonModule
+    ButtonModule,
+    AccordionComponent,
+    AccordionItemComponent,
+    TemplateIdDirective,
+    AccordionButtonDirective
   ],
   templateUrl: './marcos.component.html',
   styleUrl: './marcos.component.scss'
@@ -78,6 +87,10 @@ export class MarcosComponent {
   modalMarcoVisible: boolean = false;
   marcoLegal: any;
 
+  //datos de localstorage
+  usuarioSesion = JSON.parse(localStorage.getItem('usuarioSesion') || 'null');
+  nombreUsuario = this.usuarioSesion[0].nombre || 'Usuario';
+  rolUsuario: number = this.usuarioSesion[0].id_rol || 0;
 
   constructor(private marcoService: MarcolegalService, private iconSet: IconSetService, private fb: FormBuilder) {
     this.iconSet.icons = { cilBuilding, cilActionUndo, cilFolderOpen, cilTrash, cilZoom };
@@ -112,12 +125,21 @@ export class MarcosComponent {
                   {
                     data: null,
                     render: (data: MarcoLegalModel) => {
+                      const btnEstado  = (this.rolUsuario === 1 || this.rolUsuario === 2) ? '' : 'd-none';
                       return `
+                      <div style="display: flex; gap: 5px;">
                       <button class="btn btn-outline-secondary btn-sm ver-empresa" data-id="${data.id_marco_legal}" title="Ver">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                           <path d="M280-280h280v-80H280v80Zm0-160h400v-80H280v80Zm0-160h400v-80H280v80Zm-80 480q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/>
                           </svg>
                       </button>
+
+                      <button class="btn btn-outline-danger btn-sm eliminar-empresa ${btnEstado}" data-id="${data.id_marco_legal}" title="Eliminar">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                          <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/>
+                        </svg>
+                      </button>
+                      </div>
                     `
                   }}
                 ],
@@ -146,9 +168,10 @@ export class MarcosComponent {
                   this.verMarcoLegal(id_marco_legal);
                 }
             
-                if (button.hasClass('editar-empresa')) {
+                if (button.hasClass('eliminar-empresa')) {
                   //this.editarEmpresa(id_empresa);
-                  console.log('Editar  con ID BTN:', id_marco_legal);
+                  console.log('eliminar  con ID BTN:', id_marco_legal);
+                  this.eliminar(id_marco_legal);
                 }
             
                 if (button.hasClass('estado-empresa')) {
@@ -167,24 +190,133 @@ export class MarcosComponent {
     });
   }
 
+  // verMarcoLegal(id_marco_legal: number): void {
+  //   this.marcoService.getMarcosLegalesporID(id_marco_legal).subscribe({
+  //     next: (resp) => {
+  //       if (resp.success) {
+  //         this.marcoLegal = resp.data; // JSON anidado desde la API
+  //         this.modalMarcoVisible = true;
+  //       }
+  //     },
+  //     error: (err) => {
+  //       console.error('Error cargando marco legal:', err);
+  //     }
+  //   });
+  // }
+
   verMarcoLegal(id_marco_legal: number): void {
-    this.marcoService.getMarcosLegalesporID(id_marco_legal).subscribe({
-      next: (resp) => {
-        if (resp.success) {
-          this.marcoLegal = resp.data; // JSON anidado desde la API
-          this.modalMarcoVisible = true;
-        }
-      },
-      error: (err) => {
-        console.error('Error cargando marco legal:', err);
+  // Limpiar datos anteriores
+  this.marcoLegal = null; 
+  this.modalMarcoVisible = true;
+  
+  this.marcoService.getMarcosLegalesporID(id_marco_legal).subscribe({
+    next: (resp) => {
+      if (resp.success && resp.data) {
+        this.marcoLegal = resp.data;
+        // Debug: verifica que la estructura sea correcta
+        console.log('Datos cargados:', this.marcoLegal);
+        console.log('Títulos:', this.marcoLegal.titulos);
+      } else {
+        console.error('Respuesta sin datos válidos:', resp);
+        this.modalMarcoVisible = false;
       }
-    });
-  }
+    },
+    error: (err) => {
+      console.error('Error cargando marco legal:', err);
+      this.modalMarcoVisible = false;
+    }
+  });
+}
 
   cerrarModalMarco() {
   this.modalMarcoVisible = false;
   this.marcoLegal = null;
 }
 
+  descargarMarcoLegal(): void {
+    if (!this.marcoLegal) {
+      return;
+    }
+  
+    // Función para limpiar y reorganizar los datos
+    const limpiarDatos = (data: any) => {
+      const resultado: any = {
+        nombre: data.nombre,
+        pais_origen: data.pais_origen,
+        descripcion: data.descripcion,
+        titulos: []
+      };
+  
+      if (data.titulos && data.titulos.length > 0) {
+        resultado.titulos = data.titulos.map((titulo: any) => {
+          const tituloLimpio: any = {
+            nombre: titulo.nombre,
+            capitulos: []
+          };
+  
+          if (titulo.capitulos && titulo.capitulos.length > 0) {
+            tituloLimpio.capitulos = titulo.capitulos.map((capitulo: any) => {
+              const capituloLimpio: any = {
+                nombre: capitulo.nombre,
+                articulos: []
+              };
+  
+              if (capitulo.articulos && capitulo.articulos.length > 0) {
+                capituloLimpio.articulos = capitulo.articulos.map((articulo: any) => ({
+                  numero: parseInt(articulo.numero), // Convertir a número
+                  nombre: articulo.nombre,
+                  descripcion: articulo.descripcion,
+                  aplicable: articulo.aplicable === 1 // Convertir a boolean
+                }));
+              }
+  
+              return capituloLimpio;
+            });
+          }
+  
+          return tituloLimpio;
+        });
+      }
+  
+      return resultado;
+    };
+  
+    // Limpiar los datos
+    const datosLimpios = limpiarDatos(this.marcoLegal);
+    
+    // Crear el contenido JSON
+    const jsonContent = JSON.stringify(datosLimpios, null, 2);
+    
+    // Crear un blob con el contenido
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    
+    // Crear URL temporal
+    const url = window.URL.createObjectURL(blob);
+    
+    // Crear elemento de descarga
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${this.marcoLegal.nombre?.replace(/[^a-zA-Z0-9]/g, '-') || 'marco-legal'}.json`;
+    
+    // Ejecutar descarga
+    document.body.appendChild(link);
+    link.click();
+    
+    // Limpiar
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+
+  eliminar(id: number) {
+    this.marcoService.eliminarMarcoLegal(id).subscribe({
+      next: (res) => {
+        alert(res.message); // mostrar mensaje del backend
+        this.cargarMarcosLegales();
+      },
+      error: (err) => {
+        console.error('Error al eliminar:', err);
+      }
+    });
+  }
 
 }

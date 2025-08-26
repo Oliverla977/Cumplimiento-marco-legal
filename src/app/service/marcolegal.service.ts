@@ -26,5 +26,10 @@ export class MarcolegalService {
   getMarcosLegalesporID(id: number): Observable<{ success: boolean; data: any[] }> {
     return this.http.get<{ success: boolean; data: any[] }>(`${this.apiUrl}/marcoslegales/${id}`);
   }
+
+  // DELETE eliminar un marco legal
+  eliminarMarcoLegal(id: number): Observable<{ success: boolean; message: string }> {
+    return this.http.delete<{ success: boolean; message: string }>(`${this.apiUrl}/marcoslegales/${id}`);
+  }
   
 }
