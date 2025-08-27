@@ -17,6 +17,9 @@ import { routes } from './app.routes';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { getStorage, provideStorage } from '@angular/fire/storage'; 
+
+
 
 import { environment } from '../environments/environment';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -42,7 +45,9 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     provideFirebaseApp(() => initializeApp(environment.firestoreConfig)),
       provideAuth(() => getAuth()),
-      provideFirestore(() => getFirestore()), provideServiceWorker('ngsw-worker.js', {
+      provideFirestore(() => getFirestore()),
+      provideStorage(() => getStorage()),
+      provideServiceWorker('ngsw-worker.js', {
               enabled: !isDevMode(),
               registrationStrategy: 'registerWhenStable:30000'
             }),
