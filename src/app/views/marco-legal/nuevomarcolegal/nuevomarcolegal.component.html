@@ -106,7 +106,7 @@
 
 <!-- Modal -->
 <!-- Modal Cargar JSON -->
-<c-modal #CargarJson id="CargarJson" scrollable [(visible)]="modalJsonVisible" alignment="center">
+<c-modal #CargarJson id="CargarJson" scrollable [(visible)]="modalJsonVisible" alignment="center" backdrop="static">
   <c-modal-header>
     <h5 cModalTitle>Cargar Marco Legal desde JSON</h5>
     <button [cModalToggle]="CargarJson.id" cButtonClose></button>
@@ -118,10 +118,14 @@
 
   <c-modal-footer>
     <button [cModalToggle]="CargarJson.id" cButton color="secondary">
-      Cancelar
+      Cerrar
     </button>
-    <button cButton color="success" (click)="enviarJson()" [disabled]="!jsonData">
-      Enviar
+    <button cButton color="success" (click)="enviarJson()" [disabled]="!jsonData || loading">
+      <ng-container *ngIf="!loading">Enviar</ng-container>
+      <ng-container *ngIf="loading">
+        <span class="spinner-border spinner-border-sm"></span>
+        Enviando...
+      </ng-container>
     </button>
   </c-modal-footer>
 </c-modal>
@@ -138,3 +142,8 @@
     </div>
   </div>
 </ng-template>
+
+<div *ngIf="loading" class="overlay">
+  <div class="spinner-border text-light"></div>
+  <p class="text-light mt-2"> Procesando...</p>
+</div>

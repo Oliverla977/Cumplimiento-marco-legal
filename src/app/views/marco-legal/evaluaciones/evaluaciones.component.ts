@@ -34,6 +34,8 @@ export class EvaluacionesComponent implements OnInit {
   marcoLegalId: number = 0;
   evaluacionForm!: FormGroup;
 
+  loading = false;
+
   constructor(
     private route: ActivatedRoute,
     private marcoService: MarcolegalService,
@@ -114,6 +116,8 @@ export class EvaluacionesComponent implements OnInit {
     finalizarEvaluacion(): void {
       const resultado: any[] = [];
     
+      this.loading = true;
+
       this.articulosFormArray.controls.forEach((ctrl) => {
         const val = ctrl.getRawValue();
         resultado.push({
@@ -132,9 +136,11 @@ export class EvaluacionesComponent implements OnInit {
           console.log('Guardado:', res)
           alert("Evaluación registrada");
           this.router.navigate(['/empresas']);
+          this.loading = false;
         },
         error: (err) => {
           console.error('Error:', err)
+          this.loading = false;
         }
       });
 

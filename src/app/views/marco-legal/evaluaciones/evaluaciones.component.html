@@ -45,3 +45,8 @@
 <div class="mt-4">
   <button class="btn btn-primary" (click)="finalizarEvaluacion()">Finalizar Evaluación</button>
 </div>
+
+<div *ngIf="loading" class="overlay">
+  <div class="spinner-border text-light"></div>
+  <p class="text-light mt-2">&nbsp; Procesando...</p>
+</div>

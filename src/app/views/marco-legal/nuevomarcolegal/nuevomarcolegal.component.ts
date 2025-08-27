@@ -53,7 +53,7 @@ export class NuevomarcolegalComponent implements OnInit {
     jsonData: any = null;
     modalJsonVisible = false;
 
-
+    loading = false;
   
     constructor(private fb: FormBuilder, private marcoService: MarcolegalService) { }
   
@@ -159,16 +159,20 @@ export class NuevomarcolegalComponent implements OnInit {
   }
 
   enviarJson() {
-    if (!this.jsonData) return;
+    if (!this.jsonData || this.loading) return;
+
+    this.loading = true;
 
     this.marcoService.registrarMarcoLegal(this.jsonData).subscribe({
       next: (res) => {
         console.log('Registrado correctamente:', res);
         this.jsonData = null;
         this.modalJsonVisible = false;
+        this.loading = false;
       },
       error: (err) => {
         console.error('Error al registrar JSON:', err);
+        this.loading = false;
       },
     });
   }
