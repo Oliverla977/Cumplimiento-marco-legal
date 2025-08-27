@@ -1,11 +1,31 @@
-import { Component, OnInit  } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MarcolegalService } from '../../../service/marcolegal.service';
-import { ReactiveFormsModule, FormsModule, AbstractControl } from '@angular/forms';
+import {
+  ReactiveFormsModule,
+  FormsModule,
+  AbstractControl,
+} from '@angular/forms';
 import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AlertComponent, ButtonDirective, ButtonGroupComponent, FormCheckLabelDirective, FormControlDirective, FormLabelDirective, ToastBodyComponent, ToastComponent, ToastHeaderComponent } from '@coreui/angular';
+import {
+  AlertComponent,
+  ButtonDirective,
+  ButtonGroupComponent,
+  FormCheckLabelDirective,
+  FormControlDirective,
+  FormLabelDirective,
+  ToastBodyComponent,
+  ToastComponent,
+  ToastHeaderComponent,
+} from '@coreui/angular';
 import { EvaluacionService } from '../../../service/evaluacion.service';
+import {
+  Storage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from '@angular/fire/storage';
 
 @Component({
   selector: 'app-evaluaciones',
@@ -21,20 +41,20 @@ import { EvaluacionService } from '../../../service/evaluacion.service';
     AlertComponent,
     ToastComponent,
     ToastHeaderComponent,
-    ToastBodyComponent
-
+    ToastBodyComponent,
   ],
   templateUrl: './evaluaciones.component.html',
-  styleUrl: './evaluaciones.component.scss'
+  styleUrl: './evaluaciones.component.scss',
 })
 export class EvaluacionesComponent implements OnInit {
-
   marcoLegal: any;
   idEvaluacion: number = 0;
   marcoLegalId: number = 0;
   evaluacionForm!: FormGroup;
 
   loading = false;
+
+  private storage = inject(Storage);
 
   constructor(
     private route: ActivatedRoute,
@@ -44,125 +64,149 @@ export class EvaluacionesComponent implements OnInit {
     private router: Router
   ) {
     this.evaluacionForm = this.fb.group({
-      articulos: this.fb.array([])
+      articulos: this.fb.array([]),
     });
   }
 
   ngOnInit(): void {
     this.idEvaluacion = Number(this.route.snapshot.paramMap.get('id'));
-    this.marcoLegalId = Number(this.route.snapshot.paramMap.get('marcoLegalId'));
-  
+    this.marcoLegalId = Number(
+      this.route.snapshot.paramMap.get('marcoLegalId')
+    );
+
     //console.log('ID evaluación:', this.idEvaluacion);
     //console.log('Marco Legal ID:', this.marcoLegalId);
     this.cargarMarcosLegales();
   }
 
+  cargarMarcosLegales(): void {
+    this.marcoService.getMarcosLegalesporID(this.marcoLegalId).subscribe({
+      next: (resp) => {
+        if (resp.success) {
+          this.marcoLegal = resp.data;
 
+          // limpiamos por si acaso
+          this.articulosFormArray.clear();
 
-    cargarMarcosLegales(): void {
-      this.marcoService.getMarcosLegalesporID(this.marcoLegalId).subscribe({
-        next: (resp) => {
-          if (resp.success) {
-            this.marcoLegal = resp.data;
-    
-            // limpiamos por si acaso
-            this.articulosFormArray.clear();
-    
-            // recorrer todos los títulos -> capítulos -> artículos
-            this.marcoLegal.titulos.forEach((titulo: any) => {
-              titulo.capitulos.forEach((capitulo: any) => {
-                capitulo.articulos.forEach((articulo: any) => {
-                  const disabled = articulo.aplicable === 0;
-    
-                  const articuloForm = this.fb.group({
-                    id_articulo: [articulo.id_articulo],
-                    descripcion: [articulo.descripcion],
-                    cumplimiento: [{ value: disabled ? 4 : null, disabled: disabled }], // radiobutton
-                    observacion: [{ value: '', disabled: disabled }],
-                    //evidencia: [{ value: null, disabled: disabled }] // archivo
-                  });
-    
-                  this.articulosFormArray.push(articuloForm);
+          // recorrer todos los títulos -> capítulos -> artículos
+          this.marcoLegal.titulos.forEach((titulo: any) => {
+            titulo.capitulos.forEach((capitulo: any) => {
+              capitulo.articulos.forEach((articulo: any) => {
+                const disabled = articulo.aplicable === 0;
+
+                const articuloForm = this.fb.group({
+                  id_articulo: [articulo.id_articulo],
+                  descripcion: [articulo.descripcion],
+                  cumplimiento: [
+                    { value: disabled ? 4 : null, disabled: disabled },
+                  ], // radiobutton
+                  observacion: [{ value: '', disabled: disabled }],
+                  evidencia: [{ value: null, disabled: disabled }] // archivo
                 });
+
+                this.articulosFormArray.push(articuloForm);
               });
             });
-    
-            console.log("Form array generado:", this.evaluacionForm.value);
-          }
-        },
-        error: (err) => {
-          console.error('Error cargando marco legal:', err);
+          });
+
+          console.log('Form array generado:', this.evaluacionForm.value);
         }
-      });
+      },
+      error: (err) => {
+        console.error('Error cargando marco legal:', err);
+      },
+    });
+  }
+
+  get articulosFormArray(): FormArray {
+    return this.evaluacionForm.get('articulos') as FormArray;
+  }
+
+  onFileChange(event: any, index: number) {
+    const file = event.target.files[0];
+    if (file) {
+      this.articulosFormArray.at(index).get('evidencia')?.setValue(file);
+      console.log("Archivo asignado:", file.name, "→ índice", index);
     }
-    
-    get articulosFormArray(): FormArray {
-      return this.evaluacionForm.get('articulos') as FormArray;
-    }
+  }
 
+  asFormGroup(control: AbstractControl): FormGroup {
+    return control as FormGroup;
+  }
 
-    onFileChange(event: any, index: number) {
-      const file = event.target.files[0];
-      if (file) {
-        this.articulosFormArray.at(index).get('evidencia')?.setValue(file);
-      }
-    }
+  async finalizarEvaluacion(): Promise<void> {
+    const resultado: any[] = [];
+    this.loading = true;
 
-    asFormGroup(control: AbstractControl): FormGroup {
-      return control as FormGroup;
-    }
-    
-
-    finalizarEvaluacion(): void {
-      const resultado: any[] = [];
-    
-      this.loading = true;
-
-      this.articulosFormArray.controls.forEach((ctrl) => {
+    try {
+      for (const ctrl of this.articulosFormArray.controls) {
         const val = ctrl.getRawValue();
+        let evidenciaUrl: string | null = null;
+
+        // Si hay archivo seleccionado, lo subimos
+        if (val.evidencia instanceof File) {
+          const filePath = `evaluaciones/${this.idEvaluacion}/articulo_${
+            val.id_articulo
+          }_${Date.now()}_${val.evidencia.name}`;
+          const fileRef = ref(this.storage, filePath);
+
+          // Subir archivo
+          await uploadBytes(fileRef, val.evidencia);
+
+          // Obtener URL pública
+          evidenciaUrl = await getDownloadURL(fileRef);
+        }
+
         resultado.push({
           id_evaluacion: this.idEvaluacion,
           id_articulo: val.id_articulo,
           id_estado: val.cumplimiento,
           observaciones: val.observacion,
-          //evidencia: val.evidencia ? val.evidencia.name : null
+          evidencia: evidenciaUrl,
         });
-      });
-    
-      console.log("JSON final para enviar:", resultado);
+      }
+
+      console.log('JSON final para enviar:', resultado);
 
       this.evaluacionService.guardarEvaluaciones(resultado).subscribe({
         next: (res) => {
-          console.log('Guardado:', res)
-          alert("Evaluación registrada");
+          console.log('Guardado:', res);
+          alert('Evaluación registrada');
           this.router.navigate(['/empresas']);
           this.loading = false;
         },
         error: (err) => {
-          console.error('Error:', err)
+          console.error('Error:', err);
           this.loading = false;
-        }
+        },
       });
-
+    } catch (err) {
+      console.error('Error subiendo archivos:', err);
+      this.loading = false;
     }
+  }
 
-    getArticuloIndex(idTitulo: number, idCapitulo: number, idArticulo: number): number {
-      let index = 0;
-    
-      for (const t of this.marcoLegal.titulos) {
-        for (const c of t.capitulos) {
-          for (const a of c.articulos) {
-            if (t.id_titulo === idTitulo && c.id_capitulo === idCapitulo && a.id_articulo === idArticulo) {
-              return index;
-            }
-            index++;
+  getArticuloIndex(
+    idTitulo: number,
+    idCapitulo: number,
+    idArticulo: number
+  ): number {
+    let index = 0;
+
+    for (const t of this.marcoLegal.titulos) {
+      for (const c of t.capitulos) {
+        for (const a of c.articulos) {
+          if (
+            t.id_titulo === idTitulo &&
+            c.id_capitulo === idCapitulo &&
+            a.id_articulo === idArticulo
+          ) {
+            return index;
           }
+          index++;
         }
       }
-      return -1; // no encontrado
     }
-    
-    
-  
-
+    return -1; // no encontrado
+  }
 }
