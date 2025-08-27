@@ -535,4 +535,10 @@ cargarEmpresasAuditor(): void {
     return this.listaEmpresasAuditor.includes(id_empresa);
   }
 
+  //ver detalle de auditoria
+  verAuditoria(id_evaluacion: number): void {
+    console.log('Viendo auditoría con ID:', id_evaluacion);
+    this.router.navigate(['/evaluaciondetalle', id_evaluacion]);
+  }
+
 }

@@ -1,0 +1,177 @@
+<c-container fluid class="p-4">
+  <div *ngFor="let marcoLegalId of getObjectKeys(informeAgrupado)" class="mb-5">
+    <!-- Encabezado del Marco Legal -->
+    <c-card class="mb-4 border-primary">
+      <c-card-header class="bg-primary text-white">
+        <h2 class="mb-2">{{ informeAgrupado[+marcoLegalId].marco_legal }}</h2>
+        <p class="mb-1"><strong>País de origen:</strong> {{ informeAgrupado[+marcoLegalId].pais_origen }}</p>
+        <p class="mb-0"><strong>Descripción:</strong> {{ informeAgrupado[+marcoLegalId].descripcion_marco }}</p>
+      </c-card-header>
+    </c-card>
+
+    <!-- Títulos -->
+    <div *ngFor="let tituloId of getObjectKeys(informeAgrupado[+marcoLegalId].titulos)" class="mb-3">
+      <div class="accordion" id="accordionTitulo-{{ marcoLegalId }}-{{ tituloId }}">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingTitulo-{{ marcoLegalId }}-{{ tituloId }}">
+            <button class="accordion-button collapsed" type="button"
+                    data-bs-toggle="collapse"
+                    [attr.data-bs-target]="'#collapseTitulo-' + marcoLegalId + '-' + tituloId"
+                    aria-expanded="false"
+                    [attr.aria-controls]="'collapseTitulo-' + marcoLegalId + '-' + tituloId">
+              <i class="cil-folder me-2"></i>
+              {{ informeAgrupado[+marcoLegalId].titulos[+tituloId].titulo }}
+            </button>
+          </h2>
+          <div [id]="'collapseTitulo-' + marcoLegalId + '-' + tituloId"
+               class="accordion-collapse collapse"
+               [attr.aria-labelledby]="'headingTitulo-' + marcoLegalId + '-' + tituloId"
+               [attr.data-bs-parent]="'#accordionTitulo-' + marcoLegalId + '-' + tituloId">
+            <div class="accordion-body">
+              
+              <!-- Capítulos dentro del título -->
+              <div *ngFor="let capituloId of getObjectKeys(informeAgrupado[+marcoLegalId].titulos[+tituloId].capitulos)" class="mb-2">
+                <div class="accordion" id="accordionCapitulo-{{ marcoLegalId }}-{{ tituloId }}-{{ capituloId }}">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingCapitulo-{{ marcoLegalId }}-{{ tituloId }}-{{ capituloId }}">
+                      <button class="accordion-button collapsed bg-dark text-white" type="button"
+                              data-bs-toggle="collapse"
+                              [attr.data-bs-target]="'#collapseCapitulo-' + marcoLegalId + '-' + tituloId + '-' + capituloId"
+                              aria-expanded="false"
+                              [attr.aria-controls]="'collapseCapitulo-' + marcoLegalId + '-' + tituloId + '-' + capituloId">
+                        <i class="cil-book me-2"></i>
+                        {{ informeAgrupado[+marcoLegalId].titulos[+tituloId].capitulos[+capituloId].capitulo }}
+                      </button>
+                    </h2>
+                    <div [id]="'collapseCapitulo-' + marcoLegalId + '-' + tituloId + '-' + capituloId"
+                         class="accordion-collapse collapse"
+                         [attr.aria-labelledby]="'headingCapitulo-' + marcoLegalId + '-' + tituloId + '-' + capituloId"
+                         [attr.data-bs-parent]="'#accordionCapitulo-' + marcoLegalId + '-' + tituloId + '-' + capituloId">
+                      <div class="accordion-body">
+
+                        <!-- Artículos dentro del capítulo -->
+                        <div *ngFor="let articulo of informeAgrupado[+marcoLegalId].titulos[+tituloId].capitulos[+capituloId].articulos"
+                             class="mb-3">
+                          <c-card class="border-start border-4"
+                                  [ngClass]="{
+                                    'border-success': articulo.id_estado === 1, 
+                                    'border-danger': articulo.id_estado === 2, 
+                                    'border-warning': articulo.id_estado === 3, 
+                                    'border-secondary': articulo.id_estado === 4
+                                  }">
+                            <c-card-body>
+                              <!-- Encabezado del artículo -->
+                              <c-row class="mb-3">
+                                <c-col cols="12" md="8">
+                                  <h5 class="card-title">
+                                    Artículo {{ articulo.numero_articulo }}: {{ articulo.nombre_articulo }}
+                                  </h5>
+                                  <p class="text-muted mb-2">{{ articulo.descripcion_articulo }}</p>
+                                </c-col>
+                                <c-col cols="12" md="4" class="text-md-end">
+                                  <span class="badge fs-6 px-3 py-2"
+                                        [ngClass]="{
+                                          'bg-success': articulo.id_estado === 1,
+                                          'bg-danger': articulo.id_estado === 2,
+                                          'bg-warning': articulo.id_estado === 3,
+                                          'bg-secondary': articulo.id_estado === 4
+                                        }">
+                                    <i [class]="getEstadoIcon(articulo.id_estado)" class="me-2"></i>
+                                    {{ articulo.estado }}
+                                  </span>
+                                </c-col>
+                              </c-row>
+
+                              <!-- Descripción del estado -->
+                              <div class="mb-3">
+                                <p class="mb-1" [class]="getEstadoClass(articulo.id_estado)">
+                                  <strong>Estado:</strong> {{ articulo.descripcion_estado }}
+                                </p>
+                              </div>
+
+                              <!-- Observaciones -->
+                              <div class="mb-3">
+                                <h6 class="text-secondary">
+                                    <i class="cil-note-add me-2"></i>Observaciones:
+                                </h6>
+                                <div class="bg-dark p-3 rounded">
+                                    <p class="mb-0">
+                                    {{ articulo.observaciones && articulo.observaciones.trim() !== '' ? articulo.observaciones : 'Sin observaciones' }}
+                                    </p>
+                                </div>
+                                </div>
+
+
+                              <!-- Evidencia -->
+                              <div *ngIf="articulo.evidencia" class="mb-2">
+                                <h6 class="text-secondary">
+                                  <i class="cil-paperclip me-2"></i>Evidencia:
+                                </h6>
+                                
+                                <!-- Evidencia de imagen -->
+                                <div *ngIf="esImagen(articulo.evidencia)" class="evidence-container">
+                                  <img [src]="articulo.evidencia" 
+                                       alt="Evidencia" 
+                                       class="img-thumbnail cursor-pointer evidence-thumbnail"
+                                       (click)="abrirEvidencia(articulo.evidencia)"
+                                       style="max-width: 200px; max-height: 150px;">
+                                  <p class="small text-muted mt-1">Clic para ver en tamaño completo</p>
+                                </div>
+
+                                <!-- Evidencia de PDF -->
+                                <div *ngIf="esPDF(articulo.evidencia)" class="evidence-container">
+                                  <button type="button" 
+                                          class="btn btn-outline-danger"
+                                          (click)="abrirEvidencia(articulo.evidencia)">
+                                    <i class="cil-description me-2"></i>
+                                    Ver documento PDF
+                                  </button>
+                                </div>
+
+                                <!-- Evidencia de video -->
+                                <div *ngIf="esVideo(articulo.evidencia)" class="evidence-container">
+                                  <video controls class="evidence-video" style="max-width: 300px; max-height: 200px;">
+                                    <source [src]="articulo.evidencia" type="video/mp4">
+                                    <p>Tu navegador no soporta el elemento de video.</p>
+                                  </video>
+                                </div>
+
+                                <!-- Evidencia genérica/enlace -->
+                                <div *ngIf="!esImagen(articulo.evidencia) && !esPDF(articulo.evidencia) && !esVideo(articulo.evidencia)" 
+                                     class="evidence-container">
+                                  <button type="button" 
+                                          class="btn btn-outline-primary"
+                                          (click)="abrirEvidencia(articulo.evidencia)">
+                                    <i class="cil-external-link me-2"></i>
+                                    Ver evidencia
+                                  </button>
+                                </div>
+                              </div>
+
+                              <!-- Mensaje cuando no hay evidencia -->
+                              <div *ngIf="!articulo.evidencia" class="text-muted small">
+                                <i class="cil-info me-1"></i>Sin evidencia adjunta
+                              </div>
+                            </c-card-body>
+                          </c-card>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay datos -->
+  <div *ngIf="getObjectKeys(informeAgrupado).length === 0" class="text-center py-5">
+    <i class="cil-info fs-1 text-muted"></i>
+    <h4 class="text-muted mt-3">No hay información disponible</h4>
+    <p class="text-muted">No se encontraron datos para mostrar en este informe.</p>
+  </div>
+</c-container>

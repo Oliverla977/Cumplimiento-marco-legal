@@ -56,6 +56,12 @@ export const routes: Routes = [
         data: { roles: [1,3] } //solo admin y auditor
       },
       {
+        path: 'evaluaciondetalle/:id',
+        loadChildren: () => import('./views/marco-legal/detalle-evaluacion/routes').then((m) => m.routes),
+        canActivate: [authGuard],
+        data: { roles: [1,3,4] } //se excluye digitador
+      },
+      {
         path: 'theme',
         loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
       },

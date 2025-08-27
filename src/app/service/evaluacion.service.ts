@@ -24,4 +24,8 @@ export class EvaluacionService {
     return this.http.get(`${this.apiUrl}/evaluacion/resumen/${id_empresa}`);
   }
 
+  obtenerInformeEvaluacion(id_evaluacion: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/evaluacion/informe/${id_evaluacion}`);
+  }
+
 }

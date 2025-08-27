@@ -121,7 +121,7 @@
     <div class="row">
       <div class="col">
         <ul cListGroup *ngIf="evaluaciones.length > 0; else sinEvaluaciones">
-          <li cListGroupItem *ngFor="let eval of evaluaciones">
+          <li cButton cListGroupItem *ngFor="let eval of evaluaciones" (click)="verAuditoria(eval.id_evaluacion)" style="cursor: pointer;">
             <span>Marco legal evaluado: {{ eval.marco_legal }}</span>
             <br>
             <span class="text-muted">Fecha de evaluación: {{ formatFecha(eval.fecha) }}</span>
