@@ -4,8 +4,10 @@
     <c-card class="mb-4 border-primary">
       <c-card-header class="bg-primary text-white">
         <h2 class="mb-2">{{ informeAgrupado[+marcoLegalId].marco_legal }}</h2>
-        <p class="mb-1"><strong>País de origen:</strong> {{ informeAgrupado[+marcoLegalId].pais_origen }}</p>
+        <p class="mb-0"><strong>País de origen:</strong> {{ informeAgrupado[+marcoLegalId].pais_origen }}</p>
         <p class="mb-0"><strong>Descripción:</strong> {{ informeAgrupado[+marcoLegalId].descripcion_marco }}</p>
+        <p class="mb-0"><strong>Empresa evaluada:</strong> {{ empresa }}</p>
+        <p class="mb-0"><strong>Auditor:</strong> {{ auditor }}</p>
       </c-card-header>
     </c-card>
 

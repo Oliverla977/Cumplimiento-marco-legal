@@ -88,6 +88,10 @@ export class DetalleEvaluacionComponent implements OnInit {
   informe: ArticuloEvaluacion[] = [];
   informeAgrupado: InformeAgrupado = {};
 
+  resumen: any = null;
+  empresa: string = '';
+  auditor: string = '';
+
   constructor(
     private route: ActivatedRoute,
     private evaluacionService: EvaluacionService,
@@ -98,6 +102,25 @@ export class DetalleEvaluacionComponent implements OnInit {
     this.idEvaluacion = Number(this.route.snapshot.paramMap.get('id'));
     console.log('ID evaluación:', this.idEvaluacion);
     this.obtenerInforme();
+    this.obtenerResumenGrafica();
+  }
+
+  obtenerResumenGrafica(): void {
+    this.evaluacionService.obtenerResumenEvaluacion(this.idEvaluacion).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.resumen = res.data[0];
+          console.log("Datos de resumen recibidos:", res);
+          console.log("Resumen de evaluación:", this.resumen);
+          this.empresa = this.resumen.empresa;
+          this.auditor = this.resumen.usuario_auditor;
+          console.log("Empresa:", this.empresa, "Auditor:", this.auditor);
+        }
+    },
+      error: (err) => {
+        console.error("Error al obtener resumen:", err);
+      }
+    });
   }
 
   obtenerInforme(): void {
@@ -106,6 +129,7 @@ export class DetalleEvaluacionComponent implements OnInit {
         if (res.success) {
           this.informe = res.data;
           this.agruparInforme();
+          console.log("id recibida: ", this.idEvaluacion);
           console.log("Informe de evaluación:", res.data);
           console.log("Informe agrupado:", this.informeAgrupado);
         }
