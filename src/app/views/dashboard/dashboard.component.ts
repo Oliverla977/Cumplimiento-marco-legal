@@ -1,188 +1,173 @@
-import { NgStyle } from '@angular/common';
-import { Component, DestroyRef, DOCUMENT, effect, inject, OnInit, Renderer2, signal, WritableSignal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, OnInit, signal } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { ChartOptions } from 'chart.js';
+import { DashService } from '../../service/dash.service';
+
+import { ReactiveFormsModule } from '@angular/forms';
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ButtonGroupComponent } from '@coreui/angular';
+import { ProgressComponent } from '@coreui/angular';
+
+import { ChartType } from 'chart.js';
+
+import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
+
+
 import {
-  AvatarComponent,
+  CardFooterComponent,
+  CardGroupComponent
+} from '@coreui/angular';
+
+import {
   ButtonDirective,
-  ButtonGroupComponent,
   CardBodyComponent,
   CardComponent,
-  CardFooterComponent,
-  CardHeaderComponent,
-  ColComponent,
-  FormCheckLabelDirective,
-  GutterDirective,
-  ProgressComponent,
-  RowComponent,
-  TableDirective
+  CardImgDirective,
+  CardTextDirective,
+  CardTitleDirective
 } from '@coreui/angular';
+
+import { ColComponent, ContainerComponent, GutterDirective, RowComponent } from '@coreui/angular';
+
+import { type ChartData } from 'chart.js';
 import { ChartjsComponent } from '@coreui/angular-chartjs';
-import { IconDirective } from '@coreui/icons-angular';
-
-import { WidgetsBrandComponent } from '../widgets/widgets-brand/widgets-brand.component';
-import { WidgetsDropdownComponent } from '../widgets/widgets-dropdown/widgets-dropdown.component';
-import { DashboardChartsData, IChartProps } from './dashboard-charts-data';
-
-interface IUser {
-  name: string;
-  state: string;
-  registered: string;
-  country: string;
-  usage: number;
-  period: string;
-  payment: string;
-  activity: string;
-  avatar: string;
-  status: string;
-  color: string;
-}
 
 @Component({
+  selector: 'app-dashboard',
   templateUrl: 'dashboard.component.html',
-  styleUrls: ['dashboard.component.scss'],
-  imports: [WidgetsDropdownComponent, CardComponent, CardBodyComponent, RowComponent, ColComponent, ButtonDirective, IconDirective, ReactiveFormsModule, ButtonGroupComponent, FormCheckLabelDirective, ChartjsComponent, NgStyle, CardFooterComponent, GutterDirective, ProgressComponent, WidgetsBrandComponent, CardHeaderComponent, TableDirective, AvatarComponent]
+    imports: [CardComponent, CardImgDirective, CardBodyComponent, CardTitleDirective, CardTextDirective, ButtonDirective,
+      ContainerComponent, RowComponent, GutterDirective, ColComponent, CommonModule, ProgressComponent,
+    ReactiveFormsModule, ButtonGroupComponent, ChartjsComponent, CardFooterComponent, CardGroupComponent, WidgetsDropdownComponent
+    ],
+  styleUrls: ['dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
 
-  readonly #destroyRef: DestroyRef = inject(DestroyRef);
-  readonly #document: Document = inject(DOCUMENT);
-  readonly #renderer: Renderer2 = inject(Renderer2);
-  readonly #chartsData: DashboardChartsData = inject(DashboardChartsData);
+  // Control de radio (ULTIMAS / TODAS)
+  trafficRadioGroup: FormGroup;
+  modoSeleccionado: string = 'TODAS';
 
-  public users: IUser[] = [
-    {
-      name: 'Yiorgos Avraamu',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Us',
-      usage: 50,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Mastercard',
-      activity: '10 sec ago',
-      avatar: './assets/images/avatars/1.jpg',
-      status: 'success',
-      color: 'success'
-    },
-    {
-      name: 'Avram Tarasios',
-      state: 'Recurring ',
-      registered: 'Jan 1, 2021',
-      country: 'Br',
-      usage: 10,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Visa',
-      activity: '5 minutes ago',
-      avatar: './assets/images/avatars/2.jpg',
-      status: 'danger',
-      color: 'info'
-    },
-    {
-      name: 'Quintin Ed',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'In',
-      usage: 74,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Stripe',
-      activity: '1 hour ago',
-      avatar: './assets/images/avatars/3.jpg',
-      status: 'warning',
-      color: 'warning'
-    },
-    {
-      name: 'Enéas Kwadwo',
-      state: 'Sleep',
-      registered: 'Jan 1, 2021',
-      country: 'Fr',
-      usage: 98,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Paypal',
-      activity: 'Last month',
-      avatar: './assets/images/avatars/4.jpg',
-      status: 'secondary',
-      color: 'danger'
-    },
-    {
-      name: 'Agapetus Tadeáš',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Es',
-      usage: 22,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'ApplePay',
-      activity: 'Last week',
-      avatar: './assets/images/avatars/5.jpg',
-      status: 'success',
-      color: 'primary'
-    },
-    {
-      name: 'Friderik Dávid',
-      state: 'New',
-      registered: 'Jan 1, 2021',
-      country: 'Pl',
-      usage: 43,
-      period: 'Jun 11, 2021 - Jul 10, 2021',
-      payment: 'Amex',
-      activity: 'Yesterday',
-      avatar: './assets/images/avatars/6.jpg',
-      status: 'info',
-      color: 'dark'
-    }
-  ];
+  // Datos de la API
+  resumenData: any[] = [];
 
-  public mainChart: IChartProps = { type: 'line' };
-  public mainChartRef: WritableSignal<any> = signal(undefined);
-  #mainChartRefEffect = effect(() => {
-    if (this.mainChartRef()) {
-      this.setChartStyles();
+  // Configuración del gráfico
+  mainChart: {
+    type: ChartType;
+    data: any;
+    options: ChartOptions;
+  } = {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: []
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false
     }
-  });
-  public chart: Array<IChartProps> = [];
-  public trafficRadioGroup = new FormGroup({
-    trafficRadio: new FormControl('Month')
-  });
+  };
+
+  constructor(private dashboardService: DashService) {
+    this.trafficRadioGroup = new FormGroup({
+      trafficRadio: new FormControl('TODAS')
+    });
+  }
 
   ngOnInit(): void {
-    this.initCharts();
-    this.updateChartOnColorModeChange();
+    this.cargarDatos(this.modoSeleccionado);
   }
 
-  initCharts(): void {
-    this.mainChartRef()?.stop();
-    this.mainChart = this.#chartsData.mainChart;
+  setTrafficPeriod(modo: string) {
+    this.modoSeleccionado = modo;
+    this.cargarDatos(modo);
   }
 
-  setTrafficPeriod(value: string): void {
-    this.trafficRadioGroup.setValue({ trafficRadio: value });
-    this.#chartsData.initMainChart(value);
-    this.initCharts();
-  }
-
-  handleChartRef($chartRef: any) {
-    if ($chartRef) {
-      this.mainChartRef.set($chartRef);
-    }
-  }
-
-  updateChartOnColorModeChange() {
-    const unListen = this.#renderer.listen(this.#document.documentElement, 'ColorSchemeChange', () => {
-      this.setChartStyles();
-    });
-
-    this.#destroyRef.onDestroy(() => {
-      unListen();
+  cargarDatos(modo: string) {
+    this.dashboardService.obtenerResumenCumplimiento(modo).subscribe({
+      next: (resp) => {
+        if (resp.success) {
+          this.resumenData = resp.data;
+          this.configurarGrafico();
+        }
+      },
+      error: (err) => {
+        console.error('Error al obtener resumen de cumplimiento:', err);
+      }
     });
   }
 
-  setChartStyles() {
-    if (this.mainChartRef()) {
-      setTimeout(() => {
-        const options: ChartOptions = { ...this.mainChart.options };
-        const scales = this.#chartsData.getScales();
-        this.mainChartRef().options.scales = { ...options.scales, ...scales };
-        this.mainChartRef().update();
-      });
-    }
+  configurarGrafico() {
+    const labels = this.resumenData.map(d => `${d.empresa} (${d.fecha})`);
+    const cumple = this.resumenData.map(d => d.pct_cumple);
+    const noCumple = this.resumenData.map(d => d.pct_no_cumple);
+    const cumpleParcial = this.resumenData.map(d => d.pct_cumple_parcial);
+
+    this.mainChart = {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Cumple %',
+            backgroundColor: 'rgba(40, 167, 69, 0.3)',
+            borderColor: '#28a745',
+            data: cumple,
+            fill: true
+          },
+          {
+            label: 'No Cumple %',
+            backgroundColor: 'rgba(220, 53, 69, 0.3)',
+            borderColor: '#dc3545',
+            data: noCumple,
+            fill: true
+          },
+          {
+            label: 'Cumple Parcial %',
+            backgroundColor: 'rgba(255, 193, 7, 0.3)',
+            borderColor: '#ffc107',
+            data: cumpleParcial,
+            fill: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, position: 'bottom' }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: { stepSize: 20 }
+          }
+        }
+      }
+    };
   }
+get promedioCumple(): number {
+  const data = this.resumenData ?? []; // si es undefined, usar array vacío
+  return data.length
+    ? data.reduce((a, b) => a + (b.pct_cumple ?? 0), 0) / data.length
+    : 0;
+}
+
+get promedioNoCumple(): number {
+  const data = this.resumenData ?? [];
+  return data.length
+    ? data.reduce((a, b) => a + (b.pct_no_cumple ?? 0), 0) / data.length
+    : 0;
+}
+
+get promedioCumpleParcial(): number {
+  const data = this.resumenData ?? [];
+  return data.length
+    ? data.reduce((a, b) => a + (b.pct_cumple_parcial ?? 0), 0) / data.length
+    : 0;
+}
+
+
+
 }

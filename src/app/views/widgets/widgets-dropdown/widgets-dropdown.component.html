@@ -1,123 +1,287 @@
 <c-row class="g-4">
+  <!-- Usuarios -->
   <c-col sm="6" xl="3">
-    <c-widget-stat-a
-      color="primary"
-      [title]="'Users'"
-    >
-      <ng-template cTemplateId="widgetValueTemplate" ngPreserveWhitespaces>
-        26K
-        <span class="fw-normal" style="font-size: 12px;">
-          (-12.4% <svg cIcon name="cilArrowBottom" size="sm"></svg>)
-        </span>
-      </ng-template>
-      <ng-template cTemplateId="widgetActionTemplate">
-        <c-dropdown alignment="end" variant="btn-group">
-          <button [caret]="false" cButton cDropdownToggle class="p-0 text-white" color="transparent" aria-label="Open dropdown">
-            <svg cIcon name="cilOptions"></svg>
-          </button>
-          <ul cDropdownMenu>
-            <li><a [routerLink]="[]" cDropdownItem>Action</a></li>
-            <li><a [routerLink]="[]" cDropdownItem>Another action</a></li>
-            <li><a [routerLink]="[]" cDropdownItem>Something else here</a></li>
-            <li>
-              <hr cDropdownDivider>
-            </li>
-            <li>
-              <button cDropdownItem>Separated link</button>
-            </li>
-          </ul>
-        </c-dropdown>
-      </ng-template>
-      <ng-template cTemplateId="widgetChartTemplate">
-        <c-chart [data]="data[0]" [options]="options[0]" class="mt-3 mx-3" height="70" [type]="'line'" />
-      </ng-template>
-    </c-widget-stat-a>
+    <div class="stat-card stat-card-primary">
+      <div class="stat-card-header">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M16 7C16 9.20914 14.2091 11 12 11C9.79086 11 8 9.20914 8 7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 14C8.13401 14 5 17.134 5 21H19C19 17.134 15.866 14 12 14Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Usuarios</h3>
+        <div class="stat-value">{{ resumen.total_usuarios }}</div>
+        <p class="stat-subtitle">Total de usuarios registrados</p>
+      </div>
+    </div>
   </c-col>
+
+  <!-- Auditores -->
   <c-col sm="6" xl="3">
-    <c-widget-stat-a
-      [title]="'Income'"
-      color="info"
-    >
-      <ng-template cTemplateId="widgetValueTemplate" ngPreserveWhitespaces>
-        <span>$6.200</span>
-        <span class="fw-normal" style="font-size: 12px;">
-          (40.9%<svg cIcon name="cilArrowTop" size="sm"></svg>)
-        </span>
-      </ng-template>
-      <ng-template cTemplateId="widgetActionTemplate">
-        <c-dropdown alignment="end" variant="btn-group">
-          <button [caret]="false" cButton cDropdownToggle class="p-0 text-white" color="transparent" aria-label="Open dropdown">
-            <svg cIcon name="cilOptions"></svg>
-          </button>
-          <ul cDropdownMenu>
-            <li><a [routerLink]="[]" cDropdownItem>Action</a></li>
-            <li><a [routerLink]="[]" cDropdownItem>Another action</a></li>
-            <li><a [routerLink]="[]" cDropdownItem>Something else here</a></li>
-            <li><a [disabled]="true" [routerLink]="[]" cDropdownItem>Disabled</a></li>
-          </ul>
-        </c-dropdown>
-      </ng-template>
-      <ng-template cTemplateId="widgetChartTemplate">
-        <c-chart [data]="data[1]" [options]="options[1]" class="mt-3 mx-3" height="70" type="line" />
-      </ng-template>
-    </c-widget-stat-a>
+    <div class="stat-card stat-card-info">
+      <div class="stat-card-header">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Auditores</h3>
+        <div class="stat-value">{{ resumen.total_auditores }}</div>
+        <p class="stat-subtitle">Auditores</p>
+      </div>
+    </div>
   </c-col>
+
+  <!-- Empresas Activas -->
   <c-col sm="6" xl="3">
-    <c-widget-stat-a
-      [title]="'Conversion Rate'"
-      color="warning"
-    >
-      <ng-template cTemplateId="widgetValueTemplate" ngPreserveWhitespaces>
-        <span>2.49</span>
-        <span class="fw-normal" style="font-size: 12px;">
-          (84.7% <svg cIcon name="cilArrowTop" size="sm"></svg>)
-        </span>
-      </ng-template>
-      <ng-template cTemplateId="widgetActionTemplate">
-        <c-dropdown alignment="end" variant="btn-group">
-          <button [caret]="false" cButton cDropdownToggle class="p-0 text-white" color="transparent" aria-label="Open dropdown">
-            <svg cIcon name="cilOptions"></svg>
-          </button>
-          <ul cDropdownMenu>
-            <li><a [routerLink]="[]" cDropdownItem>Action</a></li>
-            <li><a [routerLink]="[]" cDropdownItem>Another action</a></li>
-            <li><a [routerLink]="[]" cDropdownItem>Something else here</a></li>
-            <li><a [disabled]="true" [routerLink]="[]" cDropdownItem>Disabled</a></li>
-          </ul>
-        </c-dropdown>
-      </ng-template>
-      <ng-template cTemplateId="widgetChartTemplate">
-        <c-chart [data]="data[2]" [options]="options[2]" class="mt-3" height="70" type="line" />
-      </ng-template>
-    </c-widget-stat-a>
+    <div class="stat-card stat-card-warning">
+      <div class="stat-card-header">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Empresas Activas</h3>
+        <div class="stat-value">{{ resumen.total_empresas_activas }}</div>
+        <p class="stat-subtitle">En funcionamiento</p>
+      </div>
+    </div>
   </c-col>
+
+  <!-- Marcos Legales -->
   <c-col sm="6" xl="3">
-    <c-widget-stat-a
-      [title]="'Sessions'"
-      color="danger"
-    >
-      <ng-template cTemplateId="widgetValueTemplate" ngPreserveWhitespaces>
-        <span>44K</span>
-        <span class="fw-normal" style="font-size: 12px;">
-          (-23.6% <svg cIcon name="cilArrowBottom" size="sm"></svg>)
-        </span>
-      </ng-template>
-      <ng-template cTemplateId="widgetActionTemplate">
-        <c-dropdown alignment="end" variant="btn-group">
-          <button [caret]="false" cButton cDropdownToggle class="p-0 text-white" color="transparent" aria-label="Open dropdown">
-            <svg cIcon name="cilOptions"></svg>
-          </button>
-          <ul cDropdownMenu>
-            <li><a [routerLink]="[]" cDropdownItem>Action</a></li>
-            <li><a [routerLink]="[]" cDropdownItem>Another action</a></li>
-            <li><a [routerLink]="[]" cDropdownItem>Something else here</a></li>
-            <li><a [disabled]="true" [routerLink]="[]" cDropdownItem>Disabled</a></li>
-          </ul>
-        </c-dropdown>
-      </ng-template>
-      <ng-template cTemplateId="widgetChartTemplate">
-        <c-chart [data]="data[3]" [options]="options[3]" class="mt-3 mx-3" height="70" type="bar" />
-      </ng-template>
-    </c-widget-stat-a>
+    <div class="stat-card stat-card-danger">
+      <div class="stat-card-header">
+        <div class="stat-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M14 2V8H20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 13H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 17H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M10 9H9H8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <div class="stat-content">
+        <h3 class="stat-title">Marcos Legales</h3>
+        <div class="stat-value">{{ resumen.total_marcos_legales }}</div>
+        <p class="stat-subtitle">Regulaciones vigentes</p>
+      </div>
+    </div>
   </c-col>
 </c-row>
+
+<style>
+.stat-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.stat-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent-color);
+  border-radius: 16px 16px 0 0;
+}
+
+.stat-card-primary {
+  --accent-color: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
+}
+
+.stat-card-info {
+  --accent-color: linear-gradient(90deg, #36d1dc 0%, #5b86e5 100%);
+  background: linear-gradient(135deg, rgba(54, 209, 220, 0.1), rgba(91, 134, 229, 0.05));
+}
+
+.stat-card-warning {
+  --accent-color: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, rgba(240, 147, 251, 0.1), rgba(245, 87, 108, 0.05));
+}
+
+.stat-card-danger {
+  --accent-color: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, rgba(79, 172, 254, 0.1), rgba(0, 242, 254, 0.05));
+}
+
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.stat-card-primary .stat-icon {
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.15);
+}
+
+.stat-card-info .stat-icon {
+  color: #36d1dc;
+  background: rgba(54, 209, 220, 0.15);
+}
+
+.stat-card-warning .stat-icon {
+  color: #f093fb;
+  background: rgba(240, 147, 251, 0.15);
+}
+
+.stat-card-danger .stat-icon {
+  color: #4facfe;
+  background: rgba(79, 172, 254, 0.15);
+}
+
+.stat-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+}
+
+.stat-trend.positive {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.stat-trend.neutral {
+  color: #6b7280;
+  background: rgba(107, 114, 128, 0.1);
+}
+
+.trend-indicator {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.stat-content {
+  text-align: left;
+}
+
+.stat-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  line-height: 1;
+  background: linear-gradient(135deg, #1f2937, #4b5563);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-subtitle {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+  opacity: 0.8;
+}
+
+/* Animaciones */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stat-value {
+  animation: countUp 0.8s ease-out forwards;
+}
+
+.stat-card:nth-child(1) .stat-value { animation-delay: 0.1s; }
+.stat-card:nth-child(2) .stat-value { animation-delay: 0.2s; }
+.stat-card:nth-child(3) .stat-value { animation-delay: 0.3s; }
+.stat-card:nth-child(4) .stat-value { animation-delay: 0.4s; }
+
+/* Responsive */
+@media (max-width: 576px) {
+  .stat-card {
+    padding: 20px;
+  }
+  
+  .stat-value {
+    font-size: 28px;
+  }
+  
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .stat-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .stat-title {
+    color: #9ca3af;
+  }
+  
+  .stat-value {
+    color: #f9fafb;
+    background: linear-gradient(135deg, #f9fafb, #d1d5db);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .stat-subtitle {
+    color: #6b7280;
+  }
+}
+
+</style>
