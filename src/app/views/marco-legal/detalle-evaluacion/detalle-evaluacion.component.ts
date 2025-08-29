@@ -21,6 +21,28 @@ import {
 } from '@coreui/angular';
 import { CommonModule } from '@angular/common';
 
+import { type ChartData } from 'chart.js';
+import { ChartjsComponent } from '@coreui/angular-chartjs';
+
+import { descargarInformeEvaluacion  } from '../../../service/pdf.gnerator';
+import jsPDF from 'jspdf';
+
+interface ResumenEvaluacion {
+  id_evaluacion: number;
+  empresa: string;
+  marco_legal: string;
+  usuario_auditor: string;
+  cantidad_cumple: string;
+  cantidad_no_cumple: string;
+  cantidad_cumple_parcial: string;
+  cantidad_no_aplica: string;
+  porcentaje_cumple: string;
+  porcentaje_no_cumple: string;
+  porcentaje_cumple_parcial: string;
+  porcentaje_no_aplica: string;
+  porcentaje_cumplimiento: string;
+}
+
 interface ArticuloEvaluacion {
   id_marco_legal: number;
   marco_legal: string;
@@ -78,7 +100,8 @@ interface InformeAgrupado {
     CardHeaderComponent,
     ColComponent,
     RowComponent,
-    ContainerComponent
+    ContainerComponent,
+    ChartjsComponent
   ],
   templateUrl: './detalle-evaluacion.component.html',
   styleUrl: './detalle-evaluacion.component.scss'
@@ -91,6 +114,7 @@ export class DetalleEvaluacionComponent implements OnInit {
   resumen: any = null;
   empresa: string = '';
   auditor: string = '';
+  nivelCumplimiento: string = '0';
 
   constructor(
     private route: ActivatedRoute,
@@ -114,7 +138,28 @@ export class DetalleEvaluacionComponent implements OnInit {
           console.log("Resumen de evaluación:", this.resumen);
           this.empresa = this.resumen.empresa;
           this.auditor = this.resumen.usuario_auditor;
+          this.nivelCumplimiento = this.resumen.porcentaje_cumplimiento;
           console.log("Empresa:", this.empresa, "Auditor:", this.auditor);
+          // Actualizar datos para la gráfica
+          // ⚡ Convertir strings a números
+            const cumple = parseFloat(this.resumen.porcentaje_cumple);
+            const noCumple = parseFloat(this.resumen.porcentaje_no_cumple);
+            const parcial = parseFloat(this.resumen.porcentaje_cumple_parcial);
+            const noAplica = parseFloat(this.resumen.porcentaje_no_aplica);
+    
+            // Asignar a la gráfica
+            this.data = {
+              labels: ['Cumple', 'No Cumple', 'Cumple Parcialmente', 'No Aplica'],
+              datasets: [
+                {
+                  backgroundColor: ['#28a745', '#dc3545', '#ffc107', '#6c757d'],
+                  data: [cumple, noCumple, parcial, noAplica]
+                }
+              ]
+            };
+    
+            console.log("Datos para gráfica:", this.data);
+            
         }
     },
       error: (err) => {
@@ -228,4 +273,23 @@ export class DetalleEvaluacionComponent implements OnInit {
       window.open(evidencia, '_blank');
     }
   }
+
+  // Datos para la gráfica
+  data: ChartData<'doughnut'> = {
+    labels: ['Cumple', 'No Cumple', 'Cumple Parcialmente', 'No Aplica'],
+    datasets: [
+      {
+        backgroundColor: ['#28a745', '#dc3545', '#ffc107', '#6c757d'], 
+        data: [] // lo llenaremos después
+      }
+    ]
+  };
+
+  //informe
+
+  generarInformePDF(): void {
+    descargarInformeEvaluacion(this.resumen);
+  }
+  
+
 }
