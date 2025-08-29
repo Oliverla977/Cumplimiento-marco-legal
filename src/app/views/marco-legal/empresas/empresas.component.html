@@ -80,6 +80,9 @@
     <ng-container *ngTemplateOutlet="vistaDetalleEmpresa"></ng-container>
   </c-modal-body>
   <c-modal-footer>
+    <button (click)="generarHistorialPDF()" class="btn btn-success">
+      Descargar Historial PDF
+    </button>
     <button [cModalToggle]="detalleEmpresa.id" cButton color="secondary">
       Cerrar
     </button>

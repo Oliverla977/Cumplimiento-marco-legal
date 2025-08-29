@@ -21,6 +21,8 @@ import { EvaluacionService } from '../../../service/evaluacion.service';
 import { Router } from '@angular/router';
 import { TooltipDirective } from '@coreui/angular';
 
+import { descargarHistorialEvaluaciones } from '../../../service/pdfhistorial.generator';
+
 
 @Component({
   selector: 'app-empresas',
@@ -541,4 +543,13 @@ cargarEmpresasAuditor(): void {
     this.router.navigate(['/evaluaciondetalle', id_evaluacion]);
   }
 
+  generarHistorialPDF(): void {
+    descargarHistorialEvaluaciones(
+      this.evaluaciones,
+      this.idEmpresaSeleccionada,
+      this.nombreEmpresa,
+      this.sectorEmpresa
+    );
+  }
+  
 }
