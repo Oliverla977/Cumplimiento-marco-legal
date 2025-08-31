@@ -36,9 +36,9 @@ import { ChartjsComponent } from '@coreui/angular-chartjs';
 @Component({
   selector: 'app-dashboard',
   templateUrl: 'dashboard.component.html',
-    imports: [CardComponent, CardImgDirective, CardBodyComponent, CardTitleDirective, CardTextDirective, ButtonDirective,
-      ContainerComponent, RowComponent, GutterDirective, ColComponent, CommonModule, ProgressComponent,
-    ReactiveFormsModule, ButtonGroupComponent, ChartjsComponent, CardFooterComponent, CardGroupComponent, WidgetsDropdownComponent
+    imports: [CardComponent, CardBodyComponent, ButtonDirective,
+      RowComponent, ColComponent, CommonModule,
+    ReactiveFormsModule, ButtonGroupComponent, ChartjsComponent, WidgetsDropdownComponent
     ],
   styleUrls: ['dashboard.component.scss']
 })

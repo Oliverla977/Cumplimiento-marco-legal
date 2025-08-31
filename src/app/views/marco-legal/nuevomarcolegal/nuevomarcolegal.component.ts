@@ -31,7 +31,7 @@ import { MarcolegalService } from '../../../service/marcolegal.service';
     ToastComponent,
     ToastHeaderComponent,
     ToastBodyComponent,
-    ToasterComponent, TooltipDirective, TextColorDirective,
+    ToasterComponent, TooltipDirective,
     ModalComponent,
     ModalHeaderComponent,
     ModalTitleDirective,

@@ -26,10 +26,8 @@ import { IconDirective } from '@coreui/icons-angular';
     ColComponent,
     CardComponent,
     CardBodyComponent,
-    FormDirective,
     InputGroupComponent,
     InputGroupTextDirective,
-    IconDirective,
     FormControlDirective,
     ButtonDirective
   ]

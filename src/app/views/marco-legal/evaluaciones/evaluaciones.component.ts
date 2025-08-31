@@ -32,16 +32,7 @@ import {
   imports: [
     ReactiveFormsModule,
     FormsModule,
-    CommonModule,
-    FormLabelDirective,
-    FormControlDirective,
-    ButtonDirective,
-    ButtonGroupComponent,
-    FormCheckLabelDirective,
-    AlertComponent,
-    ToastComponent,
-    ToastHeaderComponent,
-    ToastBodyComponent,
+    CommonModule
   ],
   templateUrl: './evaluaciones.component.html',
   styleUrl: './evaluaciones.component.scss',

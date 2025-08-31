@@ -20,7 +20,7 @@ import { DashService } from '../../../service/dash.service';
 @Component({
   selector: 'app-widgets-dropdown',
   templateUrl: './widgets-dropdown.component.html',
-  imports: [RowComponent, ColComponent, WidgetStatAComponent, TemplateIdDirective, IconDirective, DropdownComponent, ButtonDirective, DropdownToggleDirective, DropdownMenuDirective, DropdownItemDirective, RouterLink, DropdownDividerDirective, ChartjsComponent]
+  imports: [RowComponent, ColComponent]
 })
 export class WidgetsDropdownComponent implements OnInit, AfterContentInit {
   private changeDetectorRef = inject(ChangeDetectorRef);
