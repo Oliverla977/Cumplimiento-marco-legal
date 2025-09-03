@@ -61,6 +61,56 @@ export function generarInformePDF(resumen: ResumenEvaluacion): void {
     }
   }
 
+  const porcentajeCumplimiento = parseFloat(resumen.porcentaje_cumplimiento);
+  const nivelMadurez = obtenerNivelMadurez(porcentajeCumplimiento);
+
+  // =====================
+  // 1. CARTA DE PRESENTACIÓN
+  // =====================
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(12);
+  doc.setTextColor(...colorSecundario);
+
+  const fecha = new Date().toLocaleDateString('es-ES', { year: "numeric", month: "long", day: "numeric" });
+
+  let carta = `
+Guatemala, ${fecha}
+
+Señor Gerente General
+${resumen.empresa}
+Presente.
+
+Estimado/a:
+
+Me permito presentarle el informe de evaluación de cumplimiento normativo correspondiente a la empresa bajo el marco legal "${resumen.marco_legal}". 
+
+De acuerdo con los resultados obtenidos, la organización presenta un nivel de cumplimiento del ${resumen.porcentaje_cumplimiento}%, lo que corresponde al ${nivelMadurez.nivel}. ${nivelMadurez.descripcion}
+
+Este documento tiene como propósito brindarle una visión clara del estado actual de cumplimiento, identificando fortalezas y áreas de mejora que permitirán fortalecer la gestión de la empresa en materia normativa.
+
+Adjunto al presente se encuentra el informe detallado, en el cual se incluyen estadísticas, análisis y recomendaciones para orientar las acciones a seguir.
+
+Agradezco de antemano la atención brindada y quedo a disposición para ampliar cualquier aspecto del presente informe.
+
+Atentamente,
+
+${resumen.usuario_auditor}
+Auditor Responsable
+`;
+
+  const cartaLines = doc.splitTextToSize(carta, 170);
+  doc.text(cartaLines, 20, 40);
+
+  // Pie de página carta
+  doc.setFontSize(8);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Página 1 de 2`, 170, 280);
+
+  // =====================
+  // 2. INFORME (segunda página)
+  // =====================
+  doc.addPage();
+
   // Encabezado
   doc.setFillColor(...colorPrimario);
   doc.rect(0, 0, 210, 30, 'F');
@@ -99,8 +149,6 @@ export function generarInformePDF(resumen: ResumenEvaluacion): void {
 
   // Nivel de madurez
   yPosition += 10;
-  const porcentajeCumplimiento = parseFloat(resumen.porcentaje_cumplimiento);
-  const nivelMadurez = obtenerNivelMadurez(porcentajeCumplimiento);
 
   doc.setFillColor(...nivelMadurez.color);
   doc.rect(15, yPosition - 5, 180, 25, 'F');
@@ -190,46 +238,6 @@ export function generarInformePDF(resumen: ResumenEvaluacion): void {
 
   yPosition += (estadisticas.length * rowHeight) + 20;
 
-  // Gráfico circular simple (representación textual)
-//   doc.setFontSize(14);
-//   doc.setFont('helvetica', 'bold');
-//   doc.text('DISTRIBUCIÓN VISUAL', 20, yPosition);
-//   yPosition += 15;
-
-  // Crear barras de progreso simples
-//   const barWidth = 150;
-//   const barHeight = 8;
-//   const categorias: { label: string; porcentaje: number; color: [number, number, number] }[] = [
-//     { label: 'Cumple', porcentaje: parseFloat(resumen.porcentaje_cumple), color: [46, 204, 113] as [number, number, number] },
-//     { label: 'No Cumple', porcentaje: parseFloat(resumen.porcentaje_no_cumple), color: [231, 76, 60] as [number, number, number] },
-//     { label: 'Cumple Parcialmente', porcentaje: parseFloat(resumen.porcentaje_cumple_parcial), color: [241, 196, 15] as [number, number, number] },
-//     { label: 'No Aplica', porcentaje: parseFloat(resumen.porcentaje_no_aplica), color: [149, 165, 166] as [number, number, number] }
-//   ];
-
-//   categorias.forEach((categoria, index) => {
-//     const barY = yPosition + (index * 20);
-    
-//     // Etiqueta
-//     doc.setTextColor(...colorSecundario);
-//     doc.setFontSize(10);
-//     doc.setFont('helvetica', 'normal');
-//     doc.text(`${categoria.label}:`, 20, barY + 5);
-    
-//     // Fondo de la barra
-//     doc.setFillColor(230, 230, 230);
-//     doc.rect(80, barY, barWidth, barHeight, 'F');
-    
-//     // Barra de progreso
-//     const progressWidth = (barWidth * categoria.porcentaje) / 100;
-//     doc.setFillColor(...categoria.color);
-//     doc.rect(80, barY, progressWidth, barHeight, 'F');
-    
-//     // Porcentaje
-//     doc.setTextColor(...colorSecundario);
-//     doc.text(`${categoria.porcentaje}%`, 240, barY + 5);
-//   });
-
-//   yPosition += 100;
 
   // Recomendaciones basadas en el nivel
   doc.setFontSize(14);
@@ -260,7 +268,7 @@ export function generarInformePDF(resumen: ResumenEvaluacion): void {
   doc.setFontSize(8);
   doc.setTextColor(100, 100, 100);
   doc.text(`Generado el ${new Date().toLocaleString('es-ES')}`, 20, 280);
-  doc.text(`Página 1 de 1`, 170, 280);
+  doc.text(`Página 2 de 2`, 170, 280);
 
   // Guardar el PDF
   const nombreArchivo = `Evaluacion_${resumen.empresa}_${resumen.id_evaluacion}_${new Date().toISOString().split('T')[0]}.pdf`;
