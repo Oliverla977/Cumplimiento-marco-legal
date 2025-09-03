@@ -40,6 +40,11 @@ export const navItems: INavData[] = [
         icon: 'nav-icon-bullet'
       }
     ]
+  },
+  {
+    name: 'Niveles de Madurez',
+    url: '/nivel-madurez',
+    iconComponent: { name: 'cil-speedometer' }
   }//,
   // {
   //   title: true,

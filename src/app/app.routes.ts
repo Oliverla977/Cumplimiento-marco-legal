@@ -62,6 +62,10 @@ export const routes: Routes = [
         data: { roles: [1,3,4] } //se excluye digitador
       },
       {
+        path: 'nivel-madurez',
+        loadChildren: () => import('./views/marco-legal/nivel-madurez/routes').then((m) => m.routes)
+      },
+      {
         path: 'theme',
         loadChildren: () => import('./views/theme/routes').then((m) => m.routes)
       },

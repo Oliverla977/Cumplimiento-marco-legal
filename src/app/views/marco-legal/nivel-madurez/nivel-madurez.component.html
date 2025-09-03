@@ -1,0 +1,172 @@
+<div class="container-fluid">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-dark border-secondary">
+        <div class="card-header border-bottom border-secondary">
+          <h4 class="card-title text-white mb-0">
+            <i class="fas fa-chart-bar me-2"></i>
+            Metodología para Medir el Nivel de Madurez
+          </h4>
+        </div>
+        <div class="card-body">
+          <p class="text-white-50 mb-3">
+            El sistema incorpora un modelo de evaluación de madurez que permite medir no únicamente si una organización 
+            cumple o no con los requisitos de una ley, sino también el grado de avance en la implementación de dichos controles.
+          </p>
+          <div class="alert alert-info border-info">
+            <h6 class="alert-heading">
+              <i class="fas fa-info-circle me-2"></i>
+              Método de Cálculo
+            </h6>
+            <ul class="mb-0">
+              <li><strong>Artículo cumplido:</strong> 100%</li>
+              <li><strong>Artículo parcialmente cumplido:</strong> 50%</li>
+              <li><strong>Artículo no cumplido:</strong> 0%</li>
+              <li><strong>Artículos no aplicables:</strong> Se excluyen del cálculo</li>
+            </ul>
+            <hr>
+            <p class="mb-0">
+              <strong>El nivel de madurez se calcula como el promedio de todos los artículos aplicables evaluados.</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Niveles de Madurez Cards -->
+  <div class="row">
+    <div class="col-12">
+      <h5 class="text-white mb-3">
+        <i class="fas fa-layer-group me-2"></i>
+        Niveles de Madurez
+      </h5>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-4 col-md-6" *ngFor="let nivel of nivelesMaturez">
+      <div class="card bg-dark border-secondary h-100">
+        <div class="card-header d-flex align-items-center justify-content-between border-bottom border-secondary">
+          <div class="d-flex align-items-center">
+            <span [class]="'badge bg-' + getColor(nivel.porcentaje) + ' me-2 fs-6'">
+              Nivel {{ nivel.nivel }}
+            </span>
+            <h6 class="card-title mb-0 text-white">{{ nivel.nombre }}</h6>
+          </div>
+          <i [class]="nivel.icono + ' text-' + getColor(nivel.porcentaje)"></i>
+        </div>
+        
+        <div class="card-body">
+          <!-- Rango de porcentaje -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="text-white-50 small">Rango de cumplimiento</span>
+              <span [class]="'badge bg-' + getColor(nivel.porcentaje)">{{ nivel.rango }}</span>
+            </div>
+            
+            <!-- Progress bar -->
+            <div class="progress bg-secondary">
+              <div 
+                class="progress-bar"
+                [class]="'bg-' + getColor(nivel.porcentaje)"
+                role="progressbar" 
+                [style.width.%]="nivel.porcentaje"
+                [attr.aria-valuenow]="nivel.porcentaje" 
+                aria-valuemin="0" 
+                aria-valuemax="100">
+              </div>
+            </div>
+          </div>
+
+          <!-- Descripción -->
+          <p class="text-white-50 small mb-0">
+            {{ nivel.descripcion }}
+          </p>
+        </div>
+
+        <!-- Footer con indicador visual -->
+        <div [class]="'card-footer border-top border-' + getColor(nivel.porcentaje) + ' bg-' + getColor(nivel.porcentaje)" style="height: 4px;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Section -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card bg-dark border-secondary">
+        <div class="card-header border-bottom border-secondary">
+          <h5 class="card-title text-white mb-0">
+            <i class="fas fa-target me-2"></i>
+            Objetivo del Modelo de Madurez
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-8">
+              <p class="text-white-50 mb-3">
+                El objetivo de este modelo es ofrecer al auditor y a la organización una visión más detallada sobre 
+                qué tan consolidado está el cumplimiento, permitiendo trazar planes de mejora continua.
+              </p>
+              
+              <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-primary">
+                  <i class="fas fa-search me-1"></i>
+                  Evaluación Detallada
+                </span>
+                <span class="badge bg-info">
+                  <i class="fas fa-route me-1"></i>
+                  Planes de Mejora
+                </span>
+                <span class="badge bg-success">
+                  <i class="fas fa-chart-line me-1"></i>
+                  Mejora Continua
+                </span>
+              </div>
+            </div>
+            
+            <div class="col-md-4 text-center">
+              <div class="bg-secondary rounded-3 p-3">
+                <i class="fas fa-shield-alt fa-3x text-primary mb-2"></i>
+                <h6 class="text-white mb-1">Cumplimiento Legal</h6>
+                <small class="text-white-50">Marcos Normativos</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend Section -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card bg-dark border-secondary">
+        <div class="card-header border-bottom border-secondary">
+          <h6 class="card-title text-white mb-0">
+            <i class="fas fa-palette me-2"></i>
+            Leyenda de Colores
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="row g-2">
+            <div class="col-md-2 col-sm-4 col-6" *ngFor="let nivel of nivelesMaturez">
+              <div class="d-flex align-items-center">
+                <div [class]="'bg-' + getColor(nivel.porcentaje)" 
+                     style="width: 20px; height: 20px; border-radius: 4px;" 
+                     class="me-2">
+                </div>
+                <div>
+                  <small class="text-white d-block">{{ nivel.nombre }}</small>
+                  <small class="text-white-50">{{ nivel.rango }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
