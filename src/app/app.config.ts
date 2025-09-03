@@ -25,6 +25,8 @@ import { environment } from '../environments/environment';
 import { provideServiceWorker } from '@angular/service-worker';
 import { provideHttpClient } from '@angular/common/http';
 
+import { ToastrModule } from 'ngx-toastr';
+import { provideAnimations } from '@angular/platform-browser/animations';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -54,6 +56,25 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(), provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
-          })
+          }),
+          provideAnimations(),
+    importProvidersFrom(
+      ToastrModule.forRoot({
+        timeOut: 3000,
+        positionClass: 'toast-top-right',
+        preventDuplicates: true,
+        progressBar: true,
+        progressAnimation: 'increasing',
+        enableHtml: true,
+        closeButton: true,
+        tapToDismiss: true,
+        onActivateTick: true,
+        
+        // Configuración para tema dark
+        toastClass: 'ngx-toastr custom-toast',
+        titleClass: 'toast-title',
+        messageClass: 'toast-message'
+      })
+    ),
   ]
 };

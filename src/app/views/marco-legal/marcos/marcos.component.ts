@@ -31,6 +31,7 @@ import {
 // CoreUI Angular
 import { ButtonModule } from '@coreui/angular'; // incluye c-button
 
+import { NotificationService } from '../../../service/notification.service';
 
 
 @Component({
@@ -84,7 +85,7 @@ export class MarcosComponent {
   nombreUsuario = this.usuarioSesion[0].nombre || 'Usuario';
   rolUsuario: number = this.usuarioSesion[0].id_rol || 0;
 
-  constructor(private marcoService: MarcolegalService, private iconSet: IconSetService, private fb: FormBuilder) {
+  constructor(private marcoService: MarcolegalService, private iconSet: IconSetService, private fb: FormBuilder, private notificationService: NotificationService) {
     this.iconSet.icons = { cilBuilding, cilActionUndo, cilFolderOpen, cilTrash, cilZoom };
   }
 
@@ -215,6 +216,7 @@ export class MarcosComponent {
     },
     error: (err) => {
       console.error('Error cargando marco legal:', err);
+      this.notificationService.showError('No se pudo cargar el marco legal. Por favor, inténtelo de nuevo más tarde.', 'Error de Carga');
       this.modalMarcoVisible = false;
     }
   });
@@ -297,16 +299,19 @@ export class MarcosComponent {
     // Limpiar
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
+    this.notificationService.showSuccess('El marco legal se ha descargado exitosamente.', 'Descarga Exitosa');
   }
 
   eliminar(id: number) {
     this.marcoService.eliminarMarcoLegal(id).subscribe({
       next: (res) => {
-        alert(res.message); // mostrar mensaje del backend
+        //alert(res.message); // mostrar mensaje del backend
+        this.notificationService.showSuccess('El marco legal ha sido eliminado exitosamente.', 'Eliminación Exitosa');
         this.cargarMarcosLegales();
       },
       error: (err) => {
         console.error('Error al eliminar:', err);
+        this.notificationService.showError('No se pudo eliminar el marco legal. Por favor, inténtelo de nuevo más tarde.', 'Error de Eliminación');
       }
     });
   }

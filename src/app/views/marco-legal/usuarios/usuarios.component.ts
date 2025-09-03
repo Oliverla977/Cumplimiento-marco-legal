@@ -15,7 +15,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { LoginService } from '../../../service/login.service';
 import { NgForm } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
-
+import { NotificationService } from '../../../service/notification.service';
 
 
 @Component({
@@ -42,7 +42,8 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
     private usuarioService: UsuarioService,
     private fb: FormBuilder,
     private rolService: RolService,
-    private loginService: LoginService
+    private loginService: LoginService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -109,6 +110,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
         this.usuarioService.registrarUsuario(usuarioMysql).subscribe({
           next: (res) => {
             console.log('Usuario guardado en MySQL', res);
+            this.notificationService.showSuccess('Usuario registrado exitosamente', 'Registro Exitoso');
 
             //this.loginService.logout();
 
@@ -117,11 +119,13 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
           },
           error: (err) => {
             console.error('Error al guardar en MySQL', err);
+            this.notificationService.showError('Error al registrar usuario en el servidor', 'Error de Servidor');
           }
         });
       })
       .catch((error) => {
         console.error('Error al registrar en Firebase', error);
+        this.notificationService.showError('Error al registrar usuario en autenticación', 'Error de Firebase');
       });
   }
 }
@@ -170,7 +174,8 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
     
         } catch (error: any) {
           console.error(error.message);
-          alert(error.message);
+          this.notificationService.showError(error.message, 'Error de Actualización');
+          //alert(error.message);
         }
       }
     }
@@ -184,6 +189,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al deshabilitar usuario:', err);
+        this.notificationService.showError('Error al deshabilitar usuario', 'Error de Servidor');
       }
     });
   }
@@ -195,12 +201,14 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al habilitar usuario:', err);
+        this.notificationService.showError('Error al habilitar usuario', 'Error de Servidor');
       }
     });
   }
 
   cargarUsuarios(): void {
     console.log('Cargando usuarios...');
+    //this.notificationService.showInfo('Cargando usuarios...', 'Por favor espere');
     this.usuarioService.obtenerUsuarios().subscribe({
       next: (res) => {
         this.usuarios = res.data;
@@ -299,18 +307,22 @@ export class UsuariosComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => {
         console.error('Error al cargar usuarios:', err);
+        this.notificationService.showError('Error al cargar usuarios', 'Error de Servidor');
       }
     });
   }
 
   desactivarUsuarioPorId(id_usuario: number): void {
-    this.usuarioService.deshabilitarUsuario(id_usuario).subscribe(() => this.cargarUsuarios());
+    this.usuarioService.deshabilitarUsuario(id_usuario).subscribe(() =>
+      this.cargarUsuarios());
     //console.log('Usuario desactivado con ID:', id_usuario);
+    this.notificationService.showSuccess('Usuario deshabilitado exitosamente', 'Operación Exitosa');
   }
   
   activarUsuarioPorId(id_usuario: number): void {
     this.usuarioService.habilitarUsuario(id_usuario).subscribe(() => this.cargarUsuarios());
     //console.log('Usuario activado con ID:', id_usuario);
+    this.notificationService.showSuccess('Usuario habilitado exitosamente', 'Operación Exitosa');
   }
 
 

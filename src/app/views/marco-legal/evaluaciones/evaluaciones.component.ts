@@ -8,17 +8,7 @@ import {
 } from '@angular/forms';
 import { FormBuilder, FormGroup, FormArray, FormControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import {
-  AlertComponent,
-  ButtonDirective,
-  ButtonGroupComponent,
-  FormCheckLabelDirective,
-  FormControlDirective,
-  FormLabelDirective,
-  ToastBodyComponent,
-  ToastComponent,
-  ToastHeaderComponent,
-} from '@coreui/angular';
+import { NotificationService } from 'src/app/service/notification.service';
 import { EvaluacionService } from '../../../service/evaluacion.service';
 import {
   Storage,
@@ -52,7 +42,8 @@ export class EvaluacionesComponent implements OnInit {
     private marcoService: MarcolegalService,
     private evaluacionService: EvaluacionService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {
     this.evaluacionForm = this.fb.group({
       articulos: this.fb.array([]),
@@ -105,6 +96,7 @@ export class EvaluacionesComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error cargando marco legal:', err);
+        this.notificationService.showError('Error cargando marco legal', 'Error');
       },
     });
   }
@@ -162,7 +154,8 @@ export class EvaluacionesComponent implements OnInit {
       this.evaluacionService.guardarEvaluaciones(resultado).subscribe({
         next: (res) => {
           console.log('Guardado:', res);
-          alert('Evaluación registrada');
+          //alert('Evaluación registrada');
+          this.notificationService.showSuccess('Evaluación registrada', 'Éxito');
           this.router.navigate(['/empresas']);
           this.loading = false;
         },
@@ -173,6 +166,7 @@ export class EvaluacionesComponent implements OnInit {
       });
     } catch (err) {
       console.error('Error subiendo archivos:', err);
+      this.notificationService.showError('Error subiendo archivos', 'Error');
       this.loading = false;
     }
   }

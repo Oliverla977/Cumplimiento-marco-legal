@@ -20,6 +20,7 @@ import {
 } from '@coreui/angular';
 import { UsuarioService } from '../../../service/usuario.service';
 import { UsuarioSesionModel } from '../../../model/usuarioSesion.model';
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -36,7 +37,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private router: Router,
     private loginService: LoginService,
-    private userService: UsuarioService
+    private userService: UsuarioService,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -70,6 +72,7 @@ export class LoginComponent implements OnInit {
                       this.loginService.setUsuario(res.data);
                       //this.router.navigate(['/']);
                       console.log('Usuario sesión:', this.usuarioSesion);
+                      this.notificationService.showSuccess(`Bienvenido`, 'Inicio de sesión exitoso');
 
                       
                     } else {
@@ -82,10 +85,12 @@ export class LoginComponent implements OnInit {
                   
                 } else {
                   console.error('Error al obtener el usuario desde el backend');
+                  this.notificationService.showError('No se pudo obtener la información del usuario', 'Error de servidor');
                 }
               },
               error: (err) => {
                 console.error('Error en la solicitud al backend:', err);
+                this.notificationService.showError('Error al obtener datos del usuario', 'Error de servidor');
               }
             });
 
@@ -96,6 +101,7 @@ export class LoginComponent implements OnInit {
       })
       .catch(error =>{
         console.log("error: ", error);
+        this.notificationService.showError('Correo o contraseña incorrecta', 'Error de autenticación');
       });
   }
 

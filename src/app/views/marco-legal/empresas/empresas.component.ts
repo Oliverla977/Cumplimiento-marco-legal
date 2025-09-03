@@ -22,7 +22,7 @@ import { Router } from '@angular/router';
 import { TooltipDirective } from '@coreui/angular';
 
 import { descargarHistorialEvaluaciones } from '../../../service/pdfhistorial.generator';
-
+import { NotificationService } from '../../../service/notification.service';
 
 @Component({
   selector: 'app-empresas',
@@ -88,7 +88,8 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
     private marcoService: MarcolegalService,
     private evaluacionService: EvaluacionService,
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ){}
 
   ngOnInit(): void {
@@ -150,11 +151,13 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
         this.empresaService.actualizarEmpresa(this.usuarioEditandoId, empresaData).subscribe({
           next: (res) => {
             console.log('Empresa actualizada:', res);
+            this.notificationService.showSuccess('La empresa ha sido actualizada exitosamente.', 'Empresa Actualizada');
             this.cerrarModal();
             this.cargarEmpresas(); // refrescar lista
           },
           error: (err) => {
             console.error('Error actualizando empresa:', err);
+            this.notificationService.showError('Hubo un error al actualizar la empresa. Por favor, inténtelo de nuevo.', 'Error');
           }
         });
       } else {
@@ -162,11 +165,13 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
         this.empresaService.registrarEmpresa(empresaData).subscribe({
           next: (res) => {
             console.log('Empresa registrada:', res);
+            this.notificationService.showSuccess('La empresa ha sido registrada exitosamente.', 'Empresa Registrada');
             this.cerrarModal();
             this.cargarEmpresas(); // refrescar lista
           },
           error: (err) => {
             console.error('Error registrando empresa:', err);
+            this.notificationService.showError('Hubo un error al registrar la empresa. Por favor, inténtelo de nuevo.', 'Error');
           }
         });
       }
@@ -190,6 +195,7 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       error: (err) => {
         console.error('Error obteniendo empresa:', err);
+        this.notificationService.showError('Hubo un error al obtener los detalles de la empresa. Por favor, inténtelo de nuevo.', 'Error');
       }
     });
   }
@@ -208,6 +214,7 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       error: (err) => {
         console.error('Error obteniendo empresa:', err);
+        this.notificationService.showError('Hubo un error al obtener los marcos legales. Por favor, inténtelo de nuevo.', 'Error');
       }
     });
   }
@@ -215,10 +222,12 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
   iniciarAuditoria(marcoLegalId: number): void {
     if (!this.idEmpresaSeleccionada) {
       console.error('No hay empresa seleccionada para iniciar auditoría');
+      this.notificationService.showError('No hay empresa seleccionada para iniciar auditoría', 'Error');
       return;
     }
     if (!marcoLegalId || marcoLegalId <= 0) {
       console.error('No se ha seleccionado un marco legal para la auditoría');
+      this.notificationService.showError('No se ha seleccionado un marco legal para la auditoría', 'Error');
       return;
     }
     console.log('Iniciando auditoría para empresa ID:', this.idEmpresaSeleccionada, 'con marco legal ID:', marcoLegalId, 'por usuario ID:', this.idUsuario);
@@ -235,6 +244,7 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       },
       error: (err) => {
         console.error('Error iniciando auditoría:', err);
+        this.notificationService.showError('Hubo un error al iniciar la auditoría. Por favor, inténtelo de nuevo.', 'Error');
       }
     });
 
@@ -256,11 +266,13 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         error: (err) => {
           console.error('Error obteniendo auditores:', err);
+          this.notificationService.showError('Hubo un error al obtener la lista de auditores. Por favor, inténtelo de nuevo.', 'Error');
         }
       })
       
     } else {
       console.error('No hay empresa seleccionada para asignar auditor');
+      this.notificationService.showError('No hay empresa seleccionada para asignar auditor', 'Error');
     }
   }
 
@@ -271,9 +283,11 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       this.empresaService.asignarAuditor(this.idEmpresaSeleccionada, this.auditorSeleccionado).subscribe({
         next: (res) => {
           console.log('Auditor asignado:', res);
+          this.notificationService.showSuccess('El auditor ha sido asignado exitosamente.', 'Auditor Asignado');
         },
         error: (err) => {
           console.error('Error asignando auditor:', err);
+          this.notificationService.showError('Hubo un error al asignar el auditor. Por favor, inténtelo de nuevo.', 'Error');
         }
       });
 
@@ -441,6 +455,7 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       this.empresaService.deshabilitarEmpresa(id_empresa).subscribe({
         next: (res) => {
           console.log('Empresa deshabilitada:', res);
+          this.notificationService.showWarning('La empresa ha sido deshabilitada.', 'Empresa Deshabilitada');
           this.cargarEmpresas();
         },
         error: (err) => console.error('Error deshabilitando empresa:', err)
@@ -450,6 +465,7 @@ export class EmpresasComponent implements OnInit, OnDestroy, AfterViewInit {
       this.empresaService.habilitarEmpresa(id_empresa).subscribe({
         next: (res) => {
           console.log('Empresa habilitada:', res);
+          this.notificationService.showSuccess('La empresa ha sido habilitada.', 'Empresa Habilitada');
           this.cargarEmpresas();
         },
         error: (err) => console.error('Error habilitando empresa:', err)

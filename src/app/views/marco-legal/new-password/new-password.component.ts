@@ -20,6 +20,7 @@ import {
 } from '@coreui/angular';
 
 import { cilCheckCircle, cilX, cilLoopCircular } from '@coreui/icons';
+import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
   selector: 'app-new-password',
@@ -60,7 +61,8 @@ export class NewPasswordComponent implements OnInit {
 
   constructor(
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -136,6 +138,7 @@ export class NewPasswordComponent implements OnInit {
     try {
       await this.loginService.changePassword(this.currentPassword, this.newPassword);
       this.successMessage = 'Contraseña cambiada exitosamente';
+      this.notificationService.showSuccess(this.successMessage, 'Éxito');
       
       // Limpiar formulario
       this.currentPassword = '';
@@ -149,6 +152,7 @@ export class NewPasswordComponent implements OnInit {
 
     } catch (error: any) {
       this.errorMessage = error.message || 'Error al cambiar la contraseña';
+      this.notificationService.showError(this.errorMessage, 'Error');
     } finally {
       this.loading = false;
     }

@@ -21,7 +21,7 @@ import { AlertModule } from '@coreui/angular';
 
 
 import { MarcolegalService } from '../../../service/marcolegal.service';
-
+import { NotificationService } from '../../../service/notification.service';
 @Component({
   selector: 'app-nuevomarcolegal',
   imports: [
@@ -55,7 +55,9 @@ export class NuevomarcolegalComponent implements OnInit {
 
     loading = false;
   
-    constructor(private fb: FormBuilder, private marcoService: MarcolegalService) { }
+    constructor(private fb: FormBuilder, private marcoService: MarcolegalService,
+      private notificationService: NotificationService
+    ) { }
   
     ngOnInit(): void {
       this.marcoForm = this.fb.group({
@@ -115,9 +117,10 @@ export class NuevomarcolegalComponent implements OnInit {
       //validar formulario
       if (this.marcoForm.invalid) {
         console.error('Formulario inválido');
-        this.MensajeToast = '❌ Por favor, complete todos los campos requeridos';
-        this.showToast = true;
-        setTimeout(() => (this.showToast = false), 3000);
+        this.notificationService.showError('Por favor, complete todos los campos requeridos.', 'Error de Validación');
+        //this.MensajeToast = '❌ Por favor, complete todos los campos requeridos';
+        //this.showToast = true;
+        //setTimeout(() => (this.showToast = false), 3000);
         return;
       }
       console.log(this.marcoForm.value);
@@ -126,16 +129,19 @@ export class NuevomarcolegalComponent implements OnInit {
       this.marcoService.registrarMarcoLegal(this.marcoForm.value).subscribe({
       next: (res) => {
         console.log('Registrado correctamente:', res);
-        //limpiar el formulario
+        this.notificationService.showSuccess('El marco legal se ha registrado correctamente.', 'Registro Exitoso');
+      //limpiar el formulario
+        this.titulos.clear();
         this.marcoForm.reset();
-        this.titulos.clear(); 
+        /* 
         this.MensajeToast = '✅ Registro guardado correctamente';
         this.showToast = true;
-        setTimeout(() => (this.showToast = false), 3000);
+        setTimeout(() => (this.showToast = false), 3000);*/
 
       },
       error: (err) => {
         console.error('Error al registrar:', err);
+        this.notificationService.showError('Ocurrió un error al registrar el marco legal. Inténtelo de nuevo más tarde.', 'Error de Registro');
       }
     });
 
@@ -166,12 +172,14 @@ export class NuevomarcolegalComponent implements OnInit {
     this.marcoService.registrarMarcoLegal(this.jsonData).subscribe({
       next: (res) => {
         console.log('Registrado correctamente:', res);
+        this.notificationService.showSuccess('El marco legal se ha registrado correctamente.', 'Registro Exitoso');
         this.jsonData = null;
         this.modalJsonVisible = false;
         this.loading = false;
       },
       error: (err) => {
         console.error('Error al registrar JSON:', err);
+        this.notificationService.showError('Ocurrió un error al registrar el marco legal. Inténtelo de nuevo más tarde.', 'Error de Registro');
         this.loading = false;
       },
     });
