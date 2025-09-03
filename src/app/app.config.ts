@@ -75,6 +75,9 @@ export const appConfig: ApplicationConfig = {
         titleClass: 'toast-title',
         messageClass: 'toast-message'
       })
-    ),
+    ), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
   ]
 };
